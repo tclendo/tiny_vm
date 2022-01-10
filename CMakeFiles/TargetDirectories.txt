@@ -1,0 +1,3 @@
+/home/troy/coding/cis461/tiny_vm/CMakeFiles/tiny_vm.dir
+/home/troy/coding/cis461/tiny_vm/CMakeFiles/edit_cache.dir
+/home/troy/coding/cis461/tiny_vm/CMakeFiles/rebuild_cache.dir
