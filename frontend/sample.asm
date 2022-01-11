@@ -8,6 +8,9 @@ const  6
 call Int:times
 const  2
 call Int:divide
+const  15
+call Int:equals
+call Bool:print
 call String:print
 pop
 return 0

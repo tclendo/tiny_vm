@@ -632,8 +632,8 @@ obj_ref native_Int_minus(void ) {
   assert_is_type(other, the_class_Int);
   obj_Int other_int = (obj_Int) other;
   log_debug("Subtracting integer values: %d - %d",
-	    this_int->value, other_int->value);
-  obj_ref minuend = new_int(this_int->value - other_int->value);
+	    other_int->value, this_int->value);
+  obj_ref minuend = new_int(other_int->value - this_int->value);
   return minuend;
 }
 
@@ -673,9 +673,9 @@ obj_ref native_Int_divide(void ) {
   obj_ref other = (vm_fp - 1)->obj;
   assert_is_type(other, the_class_Int);
   obj_Int other_int = (obj_Int) other;
-  log_debug("Multiplying integer values: %d / %d",
-	    this_int->value, other_int->value);
-  obj_ref quotient= new_int(this_int->value / other_int->value);
+  log_debug("Dividing integer values: %d / %d",
+	    other_int->value, this_int->value);
+  obj_ref quotient= new_int(other_int->value / this_int->value);
   return quotient;
 }
 
