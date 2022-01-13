@@ -4,12 +4,13 @@
   "methods": [ "$constructor",
                "string",
                "print",
-                "equals",
-                "less",
-                "plus",
-		"minus",
-		"times",
-		"divide"
+               "equals",
+               "less",
+	       "negate",
+               "plus",
+	       "minus",
+	       "times",
+	       "divide"
   ],
   "fields": []
 }

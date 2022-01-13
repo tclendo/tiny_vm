@@ -493,6 +493,7 @@ obj_ref nothing = (obj_ref) &nothing_struct;
  * Methods:
  *    Those of Obj
  *    LESS
+ *    NEGATE
  *    PLUS
  *    MINUS
  *    TIMES
@@ -602,6 +603,25 @@ vm_Word method_Int_less[] = {
 };
 
 
+// Int:negate
+obj_ref native_Int_negate(void ) {
+  obj_ref this = vm_fp->obj;
+  assert_is_type(this, the_class_Int);
+  obj_Int this_int = (obj_Int) this;
+  log_debug("Negating integer value: %d",
+	    this_int->value);
+  obj_ref negation = new_int(this_int->value * -1);
+  return negation;
+}
+
+vm_Word method_Int_negate[] = {
+        {.instr = vm_op_enter},
+        {.instr = vm_op_call_native},
+        {.native = native_Int_negate},
+        {.instr = vm_op_return},
+        {.intval = 1}
+};
+
 /* Int:plus (new native_method) */
 obj_ref native_Int_plus(void ) {
     obj_ref this = vm_fp->obj;
@@ -700,6 +720,7 @@ struct  class_struct  the_class_Int_struct = {
                 method_Obj_print, // PRINT
                 method_Int_equals,  // EQUALS
                 method_Int_less, // LESS
+		method_Int_negate, // NEGATE
                 method_Int_plus, // PLUS
 		method_Int_minus, // MINUS
 		method_Int_times, // TIMES

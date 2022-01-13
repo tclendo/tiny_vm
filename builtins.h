@@ -223,6 +223,7 @@ extern obj_ref nothing;
  *    PRINT   (inherit)
  *    EQUALS  (override)
  *    and introducing
+ *    NEGATE
  *    LESS
  *    PLUS
  *    MINUS
@@ -248,6 +249,7 @@ struct class_Int_struct {
     vm_addr m_equals;
     /* Added methods */
     vm_addr m_less;
+    vm_addr m_negate;
     vm_addr m_plus;
     vm_addr m_minus;
     vm_addr m_times;

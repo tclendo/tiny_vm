@@ -55,26 +55,30 @@ class CalculateTree(Transformer):
         self.vars[name] = value
         return value
 
-    def add(self, first, second):
+    def add(self, a, b):
         print("call Int:add")
-        return first + second
+        return a + b 
     
-    def sub(self, first, second):
+    def sub(self, a, b):
         print("call Int:minus")
-        return first - second
+        return a - b 
         
-    def mul(self, first, second):
+    def mul(self, a, b):
         print("call Int:times")
-        return first * second
+        return a * b 
 
-    def div(self, first, second):
+    def div(self, a, b):
         print("call Int:divide")
-        return first // second
+        return a // b 
 
     def number(self, value):
         print("const ", value)
         return int(value)
 
+    def neg(self, num):
+        print("call Int:negate")
+        return -num
+        
     def var(self, name):
         try:
             return self.vars[name]
@@ -90,6 +94,7 @@ def main():
     s = input()
     result = calc(s)
     # extra code to verify our parser is working properly
+    # print(result)
     print("call String:print")
           
 def test():
