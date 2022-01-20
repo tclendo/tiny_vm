@@ -3,6 +3,7 @@
 
 # Cmake products
 cmake-build-debug
+CMakeCache.txt
 
 # Project generated object files,
 #   but keeping the hand-written ones
