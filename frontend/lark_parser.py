@@ -49,7 +49,12 @@ class CalculateTree(Transformer):
     from operator import add, sub, mul, truediv as div, neg
 
     def __init__(self):
+        # dictionary of all the variables
         self.vars = {}
+        # value to represent if the last instruction pushed a value
+        # onto the stack
+        self.pusharg = 0
+        # instruction stream that will be dumped at the end
         self.instructions = []
 
     def __del__(self):
@@ -60,56 +65,67 @@ class CalculateTree(Transformer):
         for element in self.instructions:
             print(element)
 
-        print("pop")
+        while self.pusharg > 0:
+            print("pop")
+            self.pusharg -= 1
+
         print("return 0")
 
     def assign_var(self, name, typ, value):
         self.instructions.append("store " + name)
         # print("store", name)
         self.vars[name] = value
+        self.pusharg -= 1
         # return value
 
     def str_lit(self, text):
         value = "const " + text
         self.instructions.append(value)
+        self.pusharg += 1
         # return str(text)
 
     def add(self, a, b):
         self.instructions.append("call Int:add")
+        self.pusharg -= 1
         # print("call Int:add")
         # return a + b 
     
     def sub(self, a, b):
         self.instructions.append("roll 1")
         self.instructions.append("call Int:minus")
+        self.pusharg -= 1
         # print("call Int:minus")
         # return a - b 
         
     def mul(self, a, b):
         self.instructions.append("call Int:times")
+        self.pusharg -= 1
         # print("call Int:times")
         # return a * b 
 
     def div(self, a, b):
         self.instructions.append("roll 1")
         self.instructions.append("call Int:divide")
+        self.pusharg -= 1
         # print("call Int:divide")
         # return a // b 
-
-    def number(self, value):
-        self.instructions.append("const " + value)
-        # print("const ", value)
-        # return int(value)
 
     def neg(self, num):
         self.instructions.append("call Int:negate")
         # print("call Int:negate")
         # return -num
         
+    def number(self, value):
+        self.instructions.append("const " + value)
+        self.pusharg += 1
+        # print("const ", value)
+        # return int(value)
+
     def var(self, name):
         try:
             self.vars[name]
             self.instructions.append("load " + name)
+            self.pusharg += 1
             # print("load ", name)
             # return self.vars[name]
         except KeyError:

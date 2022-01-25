@@ -8,7 +8,7 @@
 
 #define PATHBUFSIZE 1000
 int main(int argc, char *argv[]) {
-    set_log_level(DEBUG);
+    set_log_level(INFO);
     log_info("This is the tiny VM\n");
     int opt;
     char *main_class = "";
