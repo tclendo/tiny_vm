@@ -18,7 +18,6 @@ calc_grammar = """
 ?lhs: NAME
 
 ?rhs: sum
-| STRING -> str_lit
 
 ?sum: product
 | sum "+" product   -> add
@@ -29,6 +28,7 @@ calc_grammar = """
 | product "/" atom  -> div
 
 ?atom: NUMBER      -> number
+| STRING -> str_lit
 | "-" atom         -> neg
 | NAME -> var
 | "(" sum ")"
@@ -67,46 +67,51 @@ class CalculateTree(Transformer):
         self.instructions.append("store " + name)
         # print("store", name)
         self.vars[name] = value
-        return value
+        # return value
 
     def str_lit(self, text):
-        return str(text)
+        value = "const " + text
+        self.instructions.append(value)
+        # return str(text)
 
     def add(self, a, b):
         self.instructions.append("call Int:add")
         # print("call Int:add")
-        return a + b 
+        # return a + b 
     
     def sub(self, a, b):
+        self.instructions.append("roll 1")
         self.instructions.append("call Int:minus")
         # print("call Int:minus")
-        return a - b 
+        # return a - b 
         
     def mul(self, a, b):
         self.instructions.append("call Int:times")
         # print("call Int:times")
-        return a * b 
+        # return a * b 
 
     def div(self, a, b):
+        self.instructions.append("roll 1")
         self.instructions.append("call Int:divide")
         # print("call Int:divide")
-        return a // b 
+        # return a // b 
 
     def number(self, value):
         self.instructions.append("const " + value)
         # print("const ", value)
-        return int(value)
+        # return int(value)
 
     def neg(self, num):
         self.instructions.append("call Int:negate")
         # print("call Int:negate")
-        return -num
+        # return -num
         
     def var(self, name):
         try:
+            self.vars[name]
             self.instructions.append("load " + name)
             # print("load ", name)
-            return self.vars[name]
+            # return self.vars[name]
         except KeyError:
             raise Exception("Variable not found: %s" % name)
 
@@ -117,13 +122,14 @@ calc = calc_parser.parse
 
 def main():
     s = ""
+
     while True:
         try:
             s += input()
         except EOFError:
             break;
 
-    result = calc(s)
+    calc(s)
     # print(result)
           
 def test():

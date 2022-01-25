@@ -1,14 +1,17 @@
 .class Sample:Obj
 
 .method $constructor
-const  10
-const  5
-call Int:minus
-const  6
+.local x,y,z
+const 3
+store x
+load x
+load x
 call Int:times
-const  2
-call Int:divide
-call Int:negate
-call String:print
+store y
+load y
+const 5
+roll 1
+call Int:minus
+store z
 pop
 return 0
