@@ -1,19 +1,83 @@
 from lark import Lark, Transformer, v_args
+import argparse
 
-try:
-    input = raw_input   # For Python2 compatibility
-except NameError:
-    pass
+parser = argparse.ArgumentParser(description=
+                                 'Compile quack into assembly')
 
-calc_grammar = """
+parser.add_argument('-i', '--input', default=None,
+                    help="Specify input file name, otherwise will take lines from standard input.")
+parser.add_argument('-o', '--output', default=None,
+                    help="Specify output file name, otherwise will print to standard output.")
+args = parser.parse_args()
+
+class QuackCodeGen:
+    """
+    QuackCodeGen is our class that handles generating code, and
+    can be injected into the transformer classes so that they
+    may modify this codegen class.
+    """
+
+    def __init__(self):
+        # instruction stream that will be dumped at the end
+        self.vars = {}
+        self.instructions = []
+        self.pusharg = 0
+
+    def set_var(self, var, val):
+        self.vars[var] = val
+        
+    def get_var(self, var):
+        return self.vars[var]
+    
+    def add_instruction(self, instruction, arg):
+        self.instructions.append(instruction)
+        self.pusharg += arg
+
+    def print_instructions(self, stream):
+        if not stream:
+            print(".class MAIN:Obj")
+            print()
+            print(".method $constructor")
+            print(f".local {','.join(self.vars.keys())}")
+            for element in self.instructions:
+                print(element)
+
+            while self.pusharg > 0:
+                print("pop")
+                self.pusharg -= 1
+
+            print("return 0\n")
+
+        else:
+            with open(stream, 'w') as f:
+                f.write(".class Sample:Obj\n")
+                f.write("\n")
+                f.write(".method $constructor\n")
+                f.write(".local {}".format(','.join(self.vars.keys())))
+                f.write('\n')
+                # print(f".local {','.join(self.vars.keys())}")
+                for instruction in self.instructions:
+                    f.write(instruction)
+                    f.write('\n')
+
+
+                while self.pusharg > 0:
+                    f.write("pop\n")
+                    self.pusharg -= 1
+
+                f.write("return 0")
+        
+quack_codegen = QuackCodeGen()
+
+quack_grammar = """
 ?start: program
 
 ?program: stmt*
 
-?stmt: assignment
+?stmt: assignment ";"
 | r_expr ";" 
 
-?assignment: l_expr ":" type "=" r_expr ";" -> assign_var
+?assignment: l_expr ":" type "=" r_expr -> assign_var
 
 ?type: NAME
 
@@ -49,122 +113,105 @@ EOL: /\\n/
 
 %import common.WS_INLINE
 %ignore WS_INLINE
+%ignore EOL
 """
 
-
 @v_args(inline=True)    # Affects the signatures of the methods
-class CalculateTree(Transformer):
+class QuackTransformer(Transformer):
     from operator import add, sub, mul, truediv as div, neg
 
     def __init__(self):
-        # dictionary of all the variables and their values
-        self.vars = {}
+        # Codegen singleton class communicator
+        self.codegen = QuackCodeGen()
         # dictionary of all the elements and their types
         self.types = {}
 
-        # value to represent if the last instruction pushed a value
-        # onto the stack
-        self.pusharg = 0
-        # instruction stream that will be dumped at the end
-        self.instructions = []
-
-    def __del__(self):
-        print(".class Sample:Obj")
-        print()
-        print(".method $constructor")
-        print(f".local {','.join(self.vars.keys())}")
-        for element in self.instructions:
-            print(element)
-
-        while self.pusharg > 0:
-            print("pop")
-            self.pusharg -= 1
-
-        print("return 0")
-
     def assign_var(self, name, typ, value):
-        self.instructions.append("store " + name)
+        store = "store " + name
+        quack_codegen.add_instruction(store, -1)
         self.types[name] = typ
-        self.vars[name] = value
-        self.pusharg -= 1
+        quack_codegen.set_var(name, value)
         return name 
 
     def str_lit(self, text):
         value = "const " + text
+        quack_codegen.add_instruction(value, 1)
         self.types[text] = "String"
-        self.instructions.append(value)
-        self.pusharg += 1
         return text
 
     def add(self, a, b):
         if (self.types[a] == "Int"):
-            self.instructions.append("call Int:plus")
+            quack_codegen.add_instruction("call Int:plus", -1)
         elif (self.types[a] == "String"):
-            self.instructions.append("roll 1")
-            self.instructions.append("call String:plus")
+            quack_codegen.add_instruction("roll 1", 0)
+            quack_codegen.add_instruction("call String:plus", -1)
 
-        self.pusharg -= 1
         return a
     
     def sub(self, a, b):
-        self.instructions.append("roll 1")
-        self.instructions.append("call Int:minus")
-        self.pusharg -= 1
+        quack_codegen.add_instruction("roll 1", 0)
+        quack_codegen.add_instruction("call Int:minus", -1)
         return a
         
     def mul(self, a, b):
-        self.instructions.append("call Int:times")
-        self.pusharg -= 1
+        quack_codegen.add_instruction("call Int:times", -1)
         return a
 
     def div(self, a, b):
-        self.instructions.append("roll 1")
-        self.instructions.append("call Int:divide")
-        self.pusharg -= 1
+        quack_codegen.add_instruction("roll 1", 0)
+        quack_codegen.add_instruction("call Int:divide", -1)
         return a
 
     def neg(self, num):
-        self.instructions.append("call Int:negate")
+        quack_codegen.add_instruction("call Int:negate", 0)
         return num
 
     def call(self, callee, function):
         typ = self.types[callee]
         inst = "call " + typ + ":" + function
-        self.instructions.append(inst)
+        quack_codegen.add_instruction(inst, 0)
         
-    def number(self, value):
-        self.types[value] = "Int"
-        self.instructions.append("const " + value)
-        self.pusharg += 1
-        return value
+    def number(self, val):
+        self.types[val] = "Int"
+        value = "const " + val
+        quack_codegen.add_instruction(value, 1)
+        return val
 
     def var(self, name):
         try:
-            self.vars[name]
-            self.instructions.append("load " + name)
-            self.pusharg += 1
-            return self.vars[name]
+            x = quack_codegen.get_var(name)
+            load = "load " + name
+            quack_codegen.add_instruction(load, 1)
+            return x
 
         except KeyError:
             raise Exception("Variable not found: %s" % name)
 
-
-calc_parser = Lark(calc_grammar, parser='lalr', transformer=CalculateTree())
-calc = calc_parser.parse
-
+quack_parser = Lark(quack_grammar, parser='lalr', transformer=QuackTransformer())
+quack = quack_parser.parse
 
 def main():
+    arguments = vars(args)
+    f_input = arguments["input"]
+    f_output = arguments["output"]
     s = ""
 
-    while True:
-        try:
-            s += input()
-        except EOFError:
-            break;
+    if (f_input):
+        with open(f_input, 'r', encoding='utf-8') as f:
+            for line in f:
+                s += line
 
-    calc(s)
-    # print(result)
-          
+    else:
+        while True:
+            try:
+                s += input()
+            except EOFError:
+                break
+
+    quack(s)
+
+    quack_codegen.print_instructions(f_output)
+        
 if __name__ == '__main__':
     # test()
     main()
