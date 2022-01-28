@@ -297,9 +297,9 @@ obj_ref native_String_equals(void ) {
     obj_String other_str = (obj_String) other;
     if (strcmp(this_str->text, other_str->text) == 0) {
         return lit_true;
-    } else {
-        return lit_false;
-    }
+    } 
+
+    return lit_false;
 }
 
 vm_Word method_String_equals[] = {
@@ -325,9 +325,9 @@ obj_ref native_String_less(void ) {
 	    this_string->text, other_string->text);
   if (strcmp(this_string->text, other_string->text) <= 0) {
     return lit_true;
-  } else {
-    return lit_false;
-  }
+  } 
+
+  return lit_false;
 }
 
 vm_Word method_String_less[] = {
@@ -347,7 +347,12 @@ obj_ref native_String_plus(void ) {
   obj_String other_string = (obj_String) other;
   log_debug("Adding string values: %s + %s",
 	    this_string->text, other_string->text);
-  obj_ref sum = new_string(strcat(this_string->text, other_string->text));
+  char* new_s = (char*) malloc(strlen(this_string->text)
+			       + strlen(other_string->text));
+  strcpy(new_s, this_string->text);
+  log_debug("First string added: %s\n", new_s);
+  obj_ref sum = new_string(strcat(new_s, other_string->text));
+  log_debug("Second string appended: %s\n", new_s);
   return sum;
 }
 

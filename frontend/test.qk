@@ -1,0 +1,6 @@
+x:Int = 3;
+y:Int = x * x;
+z:Bool = true;
+a:String = "hello, world!";
+y.print();
+b:String = "Ugh, " + a;

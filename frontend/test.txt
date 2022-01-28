@@ -1,3 +1,0 @@
-x:Int = 3;
-x:Int = x * x;
-x.print();

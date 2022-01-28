@@ -100,7 +100,7 @@ quack_grammar = """
 | l_expr -> var
 | "(" sum ")"
 | bool
-| "nothing" -> lit_nothing
+| "Nothing" -> lit_nothing
 
 ?bool: "true" -> lit_true
 | "false" -> lit_false
@@ -162,10 +162,7 @@ class QuackTransformer(Transformer):
     def call(self, callee, function):
         typ = self.types[callee]
         inst = "call " + typ + ":" + function
-        if (function == "print"):
-            quack_codegen.add_instruction(inst, -1)
-        else:
-            quack_codegen.add_instruction(inst, 0)
+        quack_codegen.add_instruction(inst, 0)
         
     def number(self, val):
         self.types[val] = "Int"
@@ -177,9 +174,9 @@ class QuackTransformer(Transformer):
         self.types[text] = "String"
         return text
 
-    def lit_nothing(self, nothing="nothing"):
-        self.types["nothing"] = "Nothing"
-        quack_codegen.add_instruction("const nothing", 1)
+    def lit_nothing(self, nothing="Nothing"):
+        self.types["Nothing"] = "Nothing"
+        quack_codegen.add_instruction("const Nothing", 1)
         return nothing
 
     def lit_true(self, true="true"):

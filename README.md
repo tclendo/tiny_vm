@@ -20,8 +20,8 @@ on the tiny_vm, follow these instructions:
 
 ## HW2 Changes
 
-Homework 2 saw the extension of our toy calculator to behave in certain ways like Quack does as a language. We can assign integer and string values to variables, and we can see the pipeline in action much more than we could before. To write a program and compile it, follow these steps:
+Homework 2 saw the extension of our toy calculator to behave in certain ways like Quack does as a language. We can assign integer, string, boolean, and nothing values to variables, and we can see the pipeline in action much more than we could before. To write a program and compile it, follow these steps:
 
-	1. In the frontend folder, there is a test.txt file that can be read by the lark_parser.py file to generate an asm file. To generate the asm file, simply run python3 lark_parser.py < test.txt > sample.asm
+	1. In the frontend folder, there is a test.txt file that can be read by the quack_frontend.py file to generate an asm file. To generate the asm file, simply run python3 quack_frontend.py -i=hw2.qk -o=sample.asm
 	2. In the repository's home folder, run 'python3 assemble.py frontend/sample.asm OBJ/Sample.json' to generate the bytecode for the virtual machine in the OBJ directory.
-	3. To run the code, assuming there are no dependencies, simply run 'make' and then 'bin/tiny_vm -L OBJ Sample' and then the VM will run your code!
+	3. To run the code, simply run 'make' and then 'bin/tiny_vm -L OBJ Sample' and then the VM will run your code!
