@@ -22,7 +22,11 @@ class QuackCodeGen:
         self.vars = {}
         self.instructions = []
         self.pusharg = 0
+        self.filename = ""
 
+    def set_filename(self, name):
+        self.filename = name
+        
     def set_var(self, var, val):
         self.vars[var] = val
         
@@ -35,7 +39,7 @@ class QuackCodeGen:
 
     def print_instructions(self, stream):
         if not stream:
-            print(".class MAIN:Obj")
+            print(".class {}:Obj".format(self.filename))
             print()
             print(".method $constructor")
             print(f".local {','.join(self.vars.keys())}")
@@ -50,7 +54,7 @@ class QuackCodeGen:
 
         else:
             with open(stream, 'w') as f:
-                f.write(".class Sample:Obj\n")
+                f.write(".class {}:Obj\n".format(self.filename))
                 f.write("\n")
                 f.write(".method $constructor\n")
                 f.write(".local {}".format(','.join(self.vars.keys())))
@@ -202,9 +206,15 @@ quack = quack_parser.parse
 
 def main():
     arguments = vars(args)
-    f_input = arguments["input"]
+    f_input: str = arguments["input"]
     f_output = arguments["output"]
     s = ""
+
+    # hacky way to get base filename for main class name
+    mainclass = f_input.split('.')[0]
+    mainclass = mainclass.split('/')[1]
+    quack_codegen.set_filename(mainclass)
+    # end hacky way to get base filename
 
     if (f_input):
         with open(f_input, 'r', encoding='utf-8') as f:
@@ -219,7 +229,6 @@ def main():
                 break
 
     quack(s)
-
     quack_codegen.print_instructions(f_output)
         
 if __name__ == '__main__':

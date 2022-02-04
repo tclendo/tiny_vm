@@ -150,12 +150,12 @@ extern obj_ref str_literal(char *s);
  */
 
 struct class_Boolean_struct;
-typedef struct class_Boolean_struct* class_Boolean;
+typedef struct class_Boolean_struct* class_Bool;
 
 typedef struct obj_Boolean_struct {
     struct obj_header_struct header;
     int value;
-} * obj_Boolean;
+} * obj_Bool;
 
 struct class_Boolean_struct {
     struct class_header_struct header;

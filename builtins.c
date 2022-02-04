@@ -383,7 +383,7 @@ class_ref the_class_String = &the_class_String_struct;
 
 
 /* ================
- * Boolean
+ * Bool
  * Fields:
  *    One hidden field, an int (0 for False, -1 for True)
  * Methods:
