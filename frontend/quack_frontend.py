@@ -1,5 +1,5 @@
 from lark import Lark
-from quack_middle import QuackTransformer
+from quack_middle import ASTBuilder
 from quack_codegen import codegen
 
 import argparse
@@ -60,11 +60,10 @@ EOL: /\\n/
 %ignore EOL
 """
 
-def main():
+# Easy front end. Thanks lark
+quack_parser = Lark(quack_grammar, parser='lalr')
 
-    # Easy front end. Thanks lark
-    quack_parser = Lark(quack_grammar, parser='lalr', transformer=QuackTransformer())
-    quack = quack_parser.parse
+def main():
 
     # configure command line args
     arguments = vars(args)
@@ -92,8 +91,8 @@ def main():
                 break
 
     # Middle-end optimizations
-    quack(s)
-
+    quack = quack_parser.parse(s)
+    ast = ASTBuilder().transform(quack)
     # Back-end optimizations and godegen
     codegen.print_instructions(f_output)
         

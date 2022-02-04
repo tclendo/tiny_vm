@@ -3,6 +3,8 @@ from quack_codegen import codegen
 
 class Tables():
     '''
+    Keep track of all the default types, classes, and methods.
+    Also update data as tree traversals occur.
     '''
     pass
 
@@ -12,7 +14,7 @@ class ASTNode():
     pass
 
 @v_args(inline=True)    # Affects the signatures of the methods
-class QuackTransformer(Transformer):
+class ASTBuilder(Transformer):
     from operator import add, sub, mul, truediv as div, neg
 
     def __init__(self):
