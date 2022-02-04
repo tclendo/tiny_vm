@@ -1,4 +1,7 @@
-from lark import Lark, Transformer, v_args
+from lark import Lark
+from quack_middle import QuackTransformer
+from quack_codegen import codegen
+
 import argparse
 
 parser = argparse.ArgumentParser(description=
@@ -9,69 +12,6 @@ parser.add_argument('-i', '--input', default=None,
 parser.add_argument('-o', '--output', default=None,
                     help="Specify output file name, otherwise will print to standard output.")
 args = parser.parse_args()
-
-class QuackCodeGen:
-    """
-    QuackCodeGen is our class that handles generating code, and
-    can be injected into the transformer classes so that they
-    may modify this codegen class.
-    """
-
-    def __init__(self):
-        # instruction stream that will be dumped at the end
-        self.vars = {}
-        self.instructions = []
-        self.pusharg = 0
-        self.filename = ""
-
-    def set_filename(self, name):
-        self.filename = name
-        
-    def set_var(self, var, val):
-        self.vars[var] = val
-        
-    def get_var(self, var):
-        return self.vars[var]
-    
-    def add_instruction(self, instruction, arg):
-        self.instructions.append(instruction)
-        self.pusharg += arg
-
-    def print_instructions(self, stream):
-        if not stream:
-            print(".class {}:Obj".format(self.filename))
-            print()
-            print(".method $constructor")
-            print(f".local {','.join(self.vars.keys())}")
-            for element in self.instructions:
-                print(element)
-
-            while self.pusharg > 0:
-                print("pop")
-                self.pusharg -= 1
-
-            print("return 0\n")
-
-        else:
-            with open(stream, 'w') as f:
-                f.write(".class {}:Obj\n".format(self.filename))
-                f.write("\n")
-                f.write(".method $constructor\n")
-                f.write(".local {}".format(','.join(self.vars.keys())))
-                f.write('\n')
-                # print(f".local {','.join(self.vars.keys())}")
-                for instruction in self.instructions:
-                    f.write(instruction)
-                    f.write('\n')
-
-
-                while self.pusharg > 0:
-                    f.write("pop\n")
-                    self.pusharg -= 1
-
-                f.write("return 0")
-        
-quack_codegen = QuackCodeGen()
 
 quack_grammar = """
 ?start: program
@@ -120,91 +60,13 @@ EOL: /\\n/
 %ignore EOL
 """
 
-@v_args(inline=True)    # Affects the signatures of the methods
-class QuackTransformer(Transformer):
-    from operator import add, sub, mul, truediv as div, neg
-
-    def __init__(self):
-        # Codegen singleton class communicator
-        self.codegen = QuackCodeGen()
-        # dictionary of all the elements and their types
-        self.types = {}
-
-    def assign_var(self, name, typ, value):
-        quack_codegen.add_instruction("store " + name, -1)
-        self.types[name] = typ
-        quack_codegen.set_var(name, value)
-        return name 
-
-    def add(self, a, b):
-        if (self.types[a] == "Int"):
-            quack_codegen.add_instruction("call Int:plus", -1)
-        elif (self.types[a] == "String"):
-            quack_codegen.add_instruction("roll 1", 0)
-            quack_codegen.add_instruction("call String:plus", -1)
-
-        return a
-    
-    def sub(self, a, b):
-        quack_codegen.add_instruction("roll 1", 0)
-        quack_codegen.add_instruction("call Int:minus", -1)
-        return a
-        
-    def mul(self, a, b):
-        quack_codegen.add_instruction("call Int:times", -1)
-        return a
-
-    def div(self, a, b):
-        quack_codegen.add_instruction("roll 1", 0)
-        quack_codegen.add_instruction("call Int:divide", -1)
-        return a
-
-    def neg(self, num):
-        quack_codegen.add_instruction("call Int:negate", 0)
-        return num
-
-    def call(self, callee, function):
-        typ = self.types[callee]
-        inst = "call " + typ + ":" + function
-        quack_codegen.add_instruction(inst, 0)
-        
-    def number(self, val):
-        self.types[val] = "Int"
-        quack_codegen.add_instruction("const " + val, 1)
-        return val
-
-    def str_lit(self, text):
-        quack_codegen.add_instruction("const " + text, 1)
-        self.types[text] = "String"
-        return text
-
-    def lit_nothing(self, nothing="Nothing"):
-        self.types["Nothing"] = "Nothing"
-        quack_codegen.add_instruction("const Nothing", 1)
-        return nothing
-
-    def lit_true(self, true="true"):
-        self.types["true"] = "Bool"
-        quack_codegen.add_instruction("const true", 1)
-        return true
-
-    def lit_false(self, false="false"):
-        self.types["false"] = "Bool"
-        quack_codegen.add_instruction("const false", 1)
-        return false 
-    
-    def var(self, name):
-        try:
-            quack_codegen.add_instruction("load " + name, 1)
-            return quack_codegen.get_var(name)
-
-        except KeyError:
-            raise Exception("Variable not found: %s" % name)
-
-quack_parser = Lark(quack_grammar, parser='lalr', transformer=QuackTransformer())
-quack = quack_parser.parse
-
 def main():
+
+    # Easy front end. Thanks lark
+    quack_parser = Lark(quack_grammar, parser='lalr', transformer=QuackTransformer())
+    quack = quack_parser.parse
+
+    # configure command line args
     arguments = vars(args)
     f_input: str = arguments["input"]
     f_output = arguments["output"]
@@ -213,9 +75,10 @@ def main():
     # hacky way to get base filename for main class name
     mainclass = f_input.split('.')[0]
     mainclass = mainclass.split('/')[1]
-    quack_codegen.set_filename(mainclass)
     # end hacky way to get base filename
+    codegen.set_filename(mainclass)
 
+    # if there exists an inputfilename
     if (f_input):
         with open(f_input, 'r', encoding='utf-8') as f:
             for line in f:
@@ -228,9 +91,11 @@ def main():
             except EOFError:
                 break
 
+    # Middle-end optimizations
     quack(s)
-    quack_codegen.print_instructions(f_output)
+
+    # Back-end optimizations and godegen
+    codegen.print_instructions(f_output)
         
 if __name__ == '__main__':
-    # test()
     main()
