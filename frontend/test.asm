@@ -8,8 +8,6 @@ store x
 load y
 load x
 load x
-load x
-load x
 call Int:times
 store y
 load z
@@ -25,9 +23,6 @@ const "Ugh, "
 load a
 call String:plus
 store b
-pop
-pop
-pop
 pop
 pop
 pop

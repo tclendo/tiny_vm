@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/troy/coding/cis461/tiny_vm/builtins.c" "CMakeFiles/tiny_vm.dir/builtins.c.o" "gcc" "CMakeFiles/tiny_vm.dir/builtins.c.o.d"
+  "/home/troy/coding/cis461/tiny_vm/cjson/cJSON.c" "CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o" "gcc" "CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o.d"
   "/home/troy/coding/cis461/tiny_vm/logger.c" "CMakeFiles/tiny_vm.dir/logger.c.o" "gcc" "CMakeFiles/tiny_vm.dir/logger.c.o.d"
   "/home/troy/coding/cis461/tiny_vm/main.c" "CMakeFiles/tiny_vm.dir/main.c.o" "gcc" "CMakeFiles/tiny_vm.dir/main.c.o.d"
   "/home/troy/coding/cis461/tiny_vm/vm_code_table.c" "CMakeFiles/tiny_vm.dir/vm_code_table.c.o" "gcc" "CMakeFiles/tiny_vm.dir/vm_code_table.c.o.d"

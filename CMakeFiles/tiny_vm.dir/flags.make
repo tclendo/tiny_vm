@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = 
+C_INCLUDES = -I/home/troy/coding/cis461/tiny_vm/PRIVATE -I/home/troy/coding/cis461/tiny_vm -I/home/troy/coding/cis461/tiny_vm/cjson
 
 C_FLAGS = -std=gnu11
 

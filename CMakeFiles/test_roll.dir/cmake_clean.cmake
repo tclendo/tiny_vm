@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/test_roll.dir/builtins.c.o"
   "CMakeFiles/test_roll.dir/builtins.c.o.d"
+  "CMakeFiles/test_roll.dir/cjson/cJSON.c.o"
+  "CMakeFiles/test_roll.dir/cjson/cJSON.c.o.d"
   "CMakeFiles/test_roll.dir/logger.c.o"
   "CMakeFiles/test_roll.dir/logger.c.o.d"
   "CMakeFiles/test_roll.dir/unit_tests/test_roll.c.o"

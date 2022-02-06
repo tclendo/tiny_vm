@@ -75,10 +75,24 @@ vm_code_table.c: opdefs.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating vm_code_table.c"
 	python3 /home/troy/coding/cis461/tiny_vm/build_bytecode_table.py /home/troy/coding/cis461/tiny_vm/opdefs.txt /home/troy/coding/cis461/tiny_vm/vm_code_table.c
 
+CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o: CMakeFiles/tiny_vm.dir/flags.make
+CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o: cjson/cJSON.c
+CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o -MF CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o.d -o CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o -c /home/troy/coding/cis461/tiny_vm/cjson/cJSON.c
+
+CMakeFiles/tiny_vm.dir/cjson/cJSON.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/tiny_vm.dir/cjson/cJSON.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/troy/coding/cis461/tiny_vm/cjson/cJSON.c > CMakeFiles/tiny_vm.dir/cjson/cJSON.c.i
+
+CMakeFiles/tiny_vm.dir/cjson/cJSON.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/tiny_vm.dir/cjson/cJSON.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/troy/coding/cis461/tiny_vm/cjson/cJSON.c -o CMakeFiles/tiny_vm.dir/cjson/cJSON.c.s
+
 CMakeFiles/tiny_vm.dir/main.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/main.c.o: main.c
 CMakeFiles/tiny_vm.dir/main.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/tiny_vm.dir/main.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/tiny_vm.dir/main.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/main.c.o -MF CMakeFiles/tiny_vm.dir/main.c.o.d -o CMakeFiles/tiny_vm.dir/main.c.o -c /home/troy/coding/cis461/tiny_vm/main.c
 
 CMakeFiles/tiny_vm.dir/main.c.i: cmake_force
@@ -92,7 +106,7 @@ CMakeFiles/tiny_vm.dir/main.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/vm_state.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/vm_state.c.o: vm_state.c
 CMakeFiles/tiny_vm.dir/vm_state.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/tiny_vm.dir/vm_state.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/tiny_vm.dir/vm_state.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/vm_state.c.o -MF CMakeFiles/tiny_vm.dir/vm_state.c.o.d -o CMakeFiles/tiny_vm.dir/vm_state.c.o -c /home/troy/coding/cis461/tiny_vm/vm_state.c
 
 CMakeFiles/tiny_vm.dir/vm_state.c.i: cmake_force
@@ -106,7 +120,7 @@ CMakeFiles/tiny_vm.dir/vm_state.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/vm_ops.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/vm_ops.c.o: vm_ops.c
 CMakeFiles/tiny_vm.dir/vm_ops.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/tiny_vm.dir/vm_ops.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/tiny_vm.dir/vm_ops.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/vm_ops.c.o -MF CMakeFiles/tiny_vm.dir/vm_ops.c.o.d -o CMakeFiles/tiny_vm.dir/vm_ops.c.o -c /home/troy/coding/cis461/tiny_vm/vm_ops.c
 
 CMakeFiles/tiny_vm.dir/vm_ops.c.i: cmake_force
@@ -120,7 +134,7 @@ CMakeFiles/tiny_vm.dir/vm_ops.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/vm_code_table.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/vm_code_table.c.o: vm_code_table.c
 CMakeFiles/tiny_vm.dir/vm_code_table.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/tiny_vm.dir/vm_code_table.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/tiny_vm.dir/vm_code_table.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/vm_code_table.c.o -MF CMakeFiles/tiny_vm.dir/vm_code_table.c.o.d -o CMakeFiles/tiny_vm.dir/vm_code_table.c.o -c /home/troy/coding/cis461/tiny_vm/vm_code_table.c
 
 CMakeFiles/tiny_vm.dir/vm_code_table.c.i: cmake_force
@@ -134,7 +148,7 @@ CMakeFiles/tiny_vm.dir/vm_code_table.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/builtins.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/builtins.c.o: builtins.c
 CMakeFiles/tiny_vm.dir/builtins.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/tiny_vm.dir/builtins.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/tiny_vm.dir/builtins.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/builtins.c.o -MF CMakeFiles/tiny_vm.dir/builtins.c.o.d -o CMakeFiles/tiny_vm.dir/builtins.c.o -c /home/troy/coding/cis461/tiny_vm/builtins.c
 
 CMakeFiles/tiny_vm.dir/builtins.c.i: cmake_force
@@ -148,7 +162,7 @@ CMakeFiles/tiny_vm.dir/builtins.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/vm_core.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/vm_core.c.o: vm_core.c
 CMakeFiles/tiny_vm.dir/vm_core.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/tiny_vm.dir/vm_core.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/tiny_vm.dir/vm_core.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/vm_core.c.o -MF CMakeFiles/tiny_vm.dir/vm_core.c.o.d -o CMakeFiles/tiny_vm.dir/vm_core.c.o -c /home/troy/coding/cis461/tiny_vm/vm_core.c
 
 CMakeFiles/tiny_vm.dir/vm_core.c.i: cmake_force
@@ -162,7 +176,7 @@ CMakeFiles/tiny_vm.dir/vm_core.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/vm_loader.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/vm_loader.c.o: vm_loader.c
 CMakeFiles/tiny_vm.dir/vm_loader.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/tiny_vm.dir/vm_loader.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/tiny_vm.dir/vm_loader.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/vm_loader.c.o -MF CMakeFiles/tiny_vm.dir/vm_loader.c.o.d -o CMakeFiles/tiny_vm.dir/vm_loader.c.o -c /home/troy/coding/cis461/tiny_vm/vm_loader.c
 
 CMakeFiles/tiny_vm.dir/vm_loader.c.i: cmake_force
@@ -176,7 +190,7 @@ CMakeFiles/tiny_vm.dir/vm_loader.c.s: cmake_force
 CMakeFiles/tiny_vm.dir/logger.c.o: CMakeFiles/tiny_vm.dir/flags.make
 CMakeFiles/tiny_vm.dir/logger.c.o: logger.c
 CMakeFiles/tiny_vm.dir/logger.c.o: CMakeFiles/tiny_vm.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/tiny_vm.dir/logger.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/tiny_vm.dir/logger.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/tiny_vm.dir/logger.c.o -MF CMakeFiles/tiny_vm.dir/logger.c.o.d -o CMakeFiles/tiny_vm.dir/logger.c.o -c /home/troy/coding/cis461/tiny_vm/logger.c
 
 CMakeFiles/tiny_vm.dir/logger.c.i: cmake_force
@@ -189,6 +203,7 @@ CMakeFiles/tiny_vm.dir/logger.c.s: cmake_force
 
 # Object files for target tiny_vm
 tiny_vm_OBJECTS = \
+"CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o" \
 "CMakeFiles/tiny_vm.dir/main.c.o" \
 "CMakeFiles/tiny_vm.dir/vm_state.c.o" \
 "CMakeFiles/tiny_vm.dir/vm_ops.c.o" \
@@ -201,6 +216,7 @@ tiny_vm_OBJECTS = \
 # External object files for target tiny_vm
 tiny_vm_EXTERNAL_OBJECTS =
 
+bin/tiny_vm: CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/main.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/vm_state.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/vm_ops.c.o
@@ -210,9 +226,8 @@ bin/tiny_vm: CMakeFiles/tiny_vm.dir/vm_core.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/vm_loader.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/logger.c.o
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/build.make
-bin/tiny_vm: /usr/local/lib/libcjson.so.1.7.15
 bin/tiny_vm: CMakeFiles/tiny_vm.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking C executable bin/tiny_vm"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking C executable bin/tiny_vm"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tiny_vm.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

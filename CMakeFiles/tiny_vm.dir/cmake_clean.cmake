@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/tiny_vm.dir/builtins.c.o"
   "CMakeFiles/tiny_vm.dir/builtins.c.o.d"
+  "CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o"
+  "CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o.d"
   "CMakeFiles/tiny_vm.dir/logger.c.o"
   "CMakeFiles/tiny_vm.dir/logger.c.o.d"
   "CMakeFiles/tiny_vm.dir/main.c.o"

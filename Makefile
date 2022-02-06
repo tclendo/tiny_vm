@@ -169,6 +169,33 @@ builtins.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/builtins.c.s
 .PHONY : builtins.c.s
 
+cjson/cJSON.o: cjson/cJSON.c.o
+.PHONY : cjson/cJSON.o
+
+# target to build an object file
+cjson/cJSON.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tiny_vm.dir/build.make CMakeFiles/tiny_vm.dir/cjson/cJSON.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/cjson/cJSON.c.o
+.PHONY : cjson/cJSON.c.o
+
+cjson/cJSON.i: cjson/cJSON.c.i
+.PHONY : cjson/cJSON.i
+
+# target to preprocess a source file
+cjson/cJSON.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tiny_vm.dir/build.make CMakeFiles/tiny_vm.dir/cjson/cJSON.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/cjson/cJSON.c.i
+.PHONY : cjson/cJSON.c.i
+
+cjson/cJSON.s: cjson/cJSON.c.s
+.PHONY : cjson/cJSON.s
+
+# target to generate assembly for a file
+cjson/cJSON.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tiny_vm.dir/build.make CMakeFiles/tiny_vm.dir/cjson/cJSON.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/cjson/cJSON.c.s
+.PHONY : cjson/cJSON.c.s
+
 logger.o: logger.c.o
 .PHONY : logger.o
 
@@ -389,6 +416,9 @@ help:
 	@echo "... builtins.o"
 	@echo "... builtins.i"
 	@echo "... builtins.s"
+	@echo "... cjson/cJSON.o"
+	@echo "... cjson/cJSON.i"
+	@echo "... cjson/cJSON.s"
 	@echo "... logger.o"
 	@echo "... logger.i"
 	@echo "... logger.s"

@@ -15,24 +15,15 @@ class Tables():
         self.objects = {}
 
     def initialize_objects(self):
-        self.objects["Obj"] = {"string",
-                               "print",
-                               "equals"}
-
-        self.objects["String"] = self.objects["Obj"] | {
-            "less", "plus"}
-
-        self.objects["Bool"] = self.objects["Obj"]
-        self.objects["Nothing"] = self.objects["Obj"]
-        self.objects["Int"] = self.objects["Obj"] | {
-            "negate", "plus", "minus", "times", "divide"}
+        # TODO: implement class hierarchy for builtins
+        pass
                                
     def set_type(self, item, typ):
         self.variables[item] = typ
         
     def get_type(self, item):
         if item not in self.variables.keys():
-            return None
+            return "Obj" 
 
         return self.variables[item]
 
@@ -44,12 +35,11 @@ class Tables():
 
     def get_signature(self, func):
         if func not in self.signatures.keys():
-            return None
+            return "Obj" 
 
         return self.signatures[func]
 
 tables = Tables()
-tables.initialize_objects()
 codegen = QuackCodeGen(tables)
 
 ###
@@ -209,6 +199,7 @@ class BinaryOpNode(ASTNode):
     def get_type(self):
         l_type = self.left.get_type()
         r_type = self.right.get_type()
+        # TODO: type checking here to traverse type tree
         if l_type != r_type:
             raise TypeError(f"{l_type} and {r_type} different types")
 
@@ -242,6 +233,7 @@ class CallNode(ASTNode):
         pass
 
     def get_type(self):
+        # TODO: type should actually be the function return signature
         return self.callee.get_type()
 
     def generate(self, visitor: ASTVisitor):
@@ -264,6 +256,7 @@ class AssignmentNode(ASTNode):
 
         else:
             tables.set_type(self.left.var, self.right.get_type())
+            print(f"Set {self.left.var} type: {tables.get_type(self.left.var)}")
 
     def r_eval(self):
         pass

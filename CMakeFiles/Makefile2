@@ -83,12 +83,12 @@ clean: CMakeFiles/test_roll.dir/clean
 CMakeFiles/tiny_vm.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tiny_vm.dir/build.make CMakeFiles/tiny_vm.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tiny_vm.dir/build.make CMakeFiles/tiny_vm.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=10,11,12,13,14,15,16,17,18,19 "Built target tiny_vm"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20,21 "Built target tiny_vm"
 .PHONY : CMakeFiles/tiny_vm.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/tiny_vm.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/tiny_vm.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 0
 .PHONY : CMakeFiles/tiny_vm.dir/rule
@@ -109,12 +109,12 @@ CMakeFiles/tiny_vm.dir/clean:
 CMakeFiles/test_roll.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_roll.dir/build.make CMakeFiles/test_roll.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9 "Built target test_roll"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/troy/coding/cis461/tiny_vm/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target test_roll"
 .PHONY : CMakeFiles/test_roll.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test_roll.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 9
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_roll.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/troy/coding/cis461/tiny_vm/CMakeFiles 0
 .PHONY : CMakeFiles/test_roll.dir/rule
