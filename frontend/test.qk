@@ -1,5 +1,5 @@
 x:Int = 3;
-y:Int = x * x;
+y:Int = x.times(x, x, x);
 z:Bool = true;
 a:String = "hello, world!";
 y.print();

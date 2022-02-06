@@ -18,42 +18,6 @@ def cli():
     return args
 
 
-calc_grammar = r"""
-?start: block
-
-?block: [stmt (";" stmt)*]
-    
-?stmt: ifstmt
-    | expr
-    
-ifstmt: "if" cond "then" expr "else" expr
-
-?cond: cond "and" compare -> bool_and
-    | cond "or" compare  -> bool_or
-    | compare
-    
-compare: expr "<" expr -> less_than
-    | expr ">" expr -> greater_than
-    | expr "==" expr -> equals
-
-?expr: term
-    | expr "+" term -> add
-    | expr "-" term -> subtract
-
-?term: factor
-    | term "*" factor -> multiply
-    | term "/" factor -> divide
-    
-    
-factor: NUMBER -> number
-NUMBER: /-?[0-9]+/  
-SEMI: ";"
-%import common.WS 
-%ignore WS
-"""
-
-calc_parser = Lark(calc_grammar)
-
 LAB_COUNT = 0
 def new_label(prefix: str) -> str:
     global LAB_COUNT
@@ -177,6 +141,41 @@ class Arith(ASTNode):
                  + [self.op]
                  )
 
+calc_grammar = r"""
+?start: block
+
+?block: [stmt (";" stmt)*]
+    
+?stmt: ifstmt
+    | expr
+    
+ifstmt: "if" cond "then" expr "else" expr
+
+?cond: cond "and" compare -> bool_and
+    | cond "or" compare  -> bool_or
+    | compare
+    
+compare: expr "<" expr -> less_than
+    | expr ">" expr -> greater_than
+    | expr "==" expr -> equals
+
+?expr: term
+    | expr "+" term -> add
+    | expr "-" term -> subtract
+
+?term: factor
+    | term "*" factor -> multiply
+    | term "/" factor -> divide
+    
+    
+factor: NUMBER -> number
+NUMBER: /-?[0-9]+/  
+SEMI: ";"
+%import common.WS 
+%ignore WS
+"""
+
+calc_parser = Lark(calc_grammar)
 
 class ASTBuilder(Transformer):
     """Translate Lark tree to AST"""

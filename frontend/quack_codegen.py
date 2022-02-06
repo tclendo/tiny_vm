@@ -5,9 +5,9 @@ class QuackCodeGen:
     may modify this codegen class.
     """
 
-    def __init__(self):
+    def __init__(self, tables):
         # instruction stream that will be dumped at the end
-        self.vars = {}
+        self.tables = tables
         self.instructions = []
         self.pusharg = 0
         self.filename = ""
@@ -15,12 +15,6 @@ class QuackCodeGen:
     def set_filename(self, name):
         self.filename = name
         
-    def set_var(self, var, val):
-        self.vars[var] = val
-        
-    def get_var(self, var):
-        return self.vars[var]
-    
     def add_instruction(self, instruction, arg):
         self.instructions.append(instruction)
         self.pusharg += arg
@@ -30,7 +24,7 @@ class QuackCodeGen:
             print(".class {}:Obj".format(self.filename))
             print()
             print(".method $constructor")
-            print(f".local {','.join(self.vars.keys())}")
+            print(".local {}".format(','.join(self.tables.get_variables())))
             for element in self.instructions:
                 print(element)
 
@@ -45,7 +39,7 @@ class QuackCodeGen:
                 f.write(".class {}:Obj\n".format(self.filename))
                 f.write("\n")
                 f.write(".method $constructor\n")
-                f.write(".local {}".format(','.join(self.vars.keys())))
+                f.write(".local {}".format(','.join(self.tables.get_variables())))
                 f.write('\n')
                 # print(f".local {','.join(self.vars.keys())}")
                 for instruction in self.instructions:
@@ -57,5 +51,3 @@ class QuackCodeGen:
                     self.pusharg -= 1
 
                 f.write("return 0")
-
-codegen = QuackCodeGen()
