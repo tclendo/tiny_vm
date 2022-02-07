@@ -70,6 +70,15 @@ class ASTVisitor():
     def generate_assignment(self, node):
         codegen.add_instruction(f"store {node.left.var}", -1)
 
+    def generate_comparison(self, node):
+        if node.op == '==':
+            codegen.add_instruction(f"call {node.get_type()}:equals", 0)
+
+        elif node.op == '!=':
+            codegen.add_instruction(f"call {node.get_type()}:equals", 0)
+            codegen.add_instruction(f"call Bool:negate", 0)
+            
+        
     def generate_call(self, node):
         codegen.add_instruction(f"call {node.get_type()}:{node.function}", 0)
 
@@ -251,12 +260,12 @@ class AssignmentNode(ASTNode):
         self.right = right
         self.typ = typ
         if self.typ is not None:
-            print(f"Set {self.left.var} type: {self.typ}")
+            # print(f"Set {self.left.var} type: {self.typ}")
             tables.set_type(self.left.var, self.typ)
 
         else:
             tables.set_type(self.left.var, self.right.get_type())
-            print(f"Set {self.left.var} type: {tables.get_type(self.left.var)}")
+            # print(f"Set {self.left.var} type: {tables.get_type(self.left.var)}")
 
     def r_eval(self):
         pass
@@ -269,12 +278,41 @@ class AssignmentNode(ASTNode):
         self.right.generate(visitor)
         return visitor.generate_assignment(self)
 
+class ComparisonNode(ASTNode):
+    def __init__(self, left: ASTNode, right: ASTNode, op: str):
+        self.left = left
+        self.right = right
+        self.op = op
+
+    def r_eval(self):
+        pass
+
+    def get_type(self):
+        return "Bool"
+
+    def generate(self, visitor):
+        pass
+
+class BlockNode(ASTNode):
+    def __init__(self, statements: ASTNode):
+        self.statements = statements
+
+    def r_eval(self):
+        pass
+
+    def get_type(self):
+        return self.statements.get_type()
+
+    def generate(self, visitor):
+        self.statements.generate(visitor)
+
 class ProgramNode(ASTNode):
 
-    def __init__(self, statements: ASTNode,
-                 statement: ASTNode):
-        self.statements = statements
-        self.final = statement
+    def __init__(self, program: ASTNode,
+                 final: ASTNode):
+
+        self.program = program
+        self.final = final 
 
     def r_eval(self):
         pass
@@ -283,60 +321,8 @@ class ProgramNode(ASTNode):
         pass
 
     def generate(self, visitor):
-        self.statements.generate(visitor)
+        self.program.generate(visitor)
         self.final.generate(visitor)
-
-quack_grammar = """
-?start: program
-
-?program: stmt 
-| program stmt -> prog
-
-?stmt: assignment ";"
-| r_expr ";" 
-
-?assignment: l_expr ":" type "=" r_expr -> assign_var_typ
-| l_expr "=" r_expr -> assign_var
-
-?type: IDENT
-
-?l_expr: IDENT -> var
-
-?r_expr: sum
-| r_expr "." IDENT "(" params? ")" -> call
-
-?params: l_expr
-| params "," l_expr -> parameters
-
-?sum: product
-| sum "+" product   -> add
-| sum "-" product   -> sub
-
-?product: atom
-| product "*" atom  -> mul
-| product "/" atom  -> div
-
-?atom: NUMBER      -> number
-| STRING -> str_lit
-| "-" atom         -> neg
-| l_expr
-| "(" sum ")"
-| bool
-| "Nothing" -> lit_nothing
-
-?bool: "true" -> lit_true
-| "false" -> lit_false
-
-%import common.ESCAPED_STRING -> STRING
-%import common.NUMBER
-
-EOL: /\\n/
-IDENT: /[_a-zA-Z][_a-zA-A0-9]*/
-
-%import common.WS_INLINE
-%ignore WS_INLINE
-%ignore EOL
-"""
 
 @v_args(inline=True)    # Affects the signatures of the methods
 class ASTBuilder(Transformer):
@@ -344,12 +330,14 @@ class ASTBuilder(Transformer):
 
     def __init__(self):
         # dictionary of all the elements and their types
-        self.types = {}
+        pass
 
     def prog(self, program, statement):
-        # print(f"{program} {statement}")
         return ProgramNode(program, statement)
-
+        
+    def block(self, statements):
+        return BlockNode(statements)
+    
     def assign_var_typ(self, name, typ, value):
         # print(f"{name}: {typ} = {value}")
         return AssignmentNode(name, value, typ)
@@ -381,6 +369,30 @@ class ASTBuilder(Transformer):
         # print(f"{left} / {right}")
         return BinaryOpNode("/", left, right)
 
+    def or_op(self, left, right):
+        pass
+
+    def and_op(self, left, right):
+        pass
+
+    def equal_compare(self, left, right):
+        pass
+
+    def notequal_compare(self, left, right):
+        pass
+
+    def greater_than(self, left, right):
+        pass
+
+    def greater_than_eq(self, left, right):
+        pass
+
+    def less_than(self, left, right):
+        pass
+
+    def less_than_eq(self, left, right):
+        pass
+    
     def neg(self, expr):
         # print(f"-{expr}")
         return UnaryOpNode("-", expr)
@@ -397,7 +409,7 @@ class ASTBuilder(Transformer):
         # print(f"{text}")
         return StringLiteralNode(text)
 
-    def lit_nothing(self, nothing="Nothing"):
+    def lit_nothing(self, nothing):
         # print(f"{nothing}")
         return NothingLiteralNode()
 

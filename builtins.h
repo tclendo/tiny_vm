@@ -164,6 +164,7 @@ struct class_Boolean_struct {
     vm_addr m_string;
     vm_addr m_print;
     vm_addr m_equals;
+    vm_addr m_negate;
 };
 
 extern class_ref the_class_Boolean;
@@ -251,6 +252,9 @@ struct class_Int_struct {
     vm_addr m_equals;
     /* Added methods */
     vm_addr m_less;
+    vm_addr m_greater;
+    vm_addr m_less_eq;
+    vm_addr m_greater_eq;
     vm_addr m_negate;
     vm_addr m_plus;
     vm_addr m_minus;

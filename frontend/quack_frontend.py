@@ -1,5 +1,6 @@
 from lark import Lark
-from quack_middle import ASTBuilder, ASTVisitor, quack_grammar, codegen
+from quack_grammar import quack_grammar
+from quack_middle import ASTBuilder, ASTVisitor, codegen
 
 import argparse
 
