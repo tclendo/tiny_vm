@@ -5,16 +5,12 @@ quack_grammar = """
 | program stmt -> prog
 
 ?stmt: assignment ";"
-| r_expr ";" 
-| "while" condition block
-| "if" condition block elifs? else?
+| r_expr ";" -> unusedstmt 
+| "while" condition block -> whilestmt
+| "if" condition block otherwise -> ifstmt
 
-?elifs: elif
-| elifs elif
-
-?elif: "elif" condition block
-
-?else: "else" block
+?otherwise: "else" block -> else
+| "elif" condition block otherwise -> ifstmt
 
 ?type: IDENT
 
@@ -30,8 +26,11 @@ quack_grammar = """
 ?params: l_expr
 | params "," l_expr -> parameters
 
-?r_expr: or
+?r_expr: not 
 | r_expr "." IDENT "(" params? ")" -> call
+
+?not: or
+| "not" comparison -> not_op
 
 ?or: and
 | or "or" and -> or_op

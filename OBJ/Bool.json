@@ -4,8 +4,8 @@
   "methods": [ "$constructor",
     "string",
     "print",
-	       "equals",
-	       "negate"
+    "equals",
+    "negate"
   ],
   "fields": [],
   "constants": [],

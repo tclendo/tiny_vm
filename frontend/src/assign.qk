@@ -1,0 +1,4 @@
+x = 1;
+x.print();
+x = x + 1;
+x.print();

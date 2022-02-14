@@ -1,5 +1,4 @@
 from lark import Transformer, v_args
-from quack_codegen import QuackCodeGen
 
 class Tables():
     '''
@@ -40,7 +39,6 @@ class Tables():
         return self.signatures[func]
 
 tables = Tables()
-codegen = QuackCodeGen(tables)
 
 ###
 # Our AST Visitor pattern class
@@ -56,8 +54,10 @@ class ASTVisitor():
 
     def generate_binary(self, node):
         if node.op == '-':
+            codegen.add_instruction(f"roll 1", 0)
             codegen.add_instruction(f"call {node.get_type()}:minus", -1)
         elif node.op == '/':
+            codegen.add_instruction(f"roll 1", 0)
             codegen.add_instruction(f"call {node.get_type()}:divide", -1)
 
         elif node.op == '+':
@@ -72,12 +72,28 @@ class ASTVisitor():
 
     def generate_comparison(self, node):
         if node.op == '==':
-            codegen.add_instruction(f"call {node.get_type()}:equals", 0)
+            codegen.add_instruction(f"call {node.left.get_type()}:equals", -1)
 
         elif node.op == '!=':
-            codegen.add_instruction(f"call {node.get_type()}:equals", 0)
+            codegen.add_instruction(f"call {node.left.get_type()}:equals", -1)
             codegen.add_instruction(f"call Bool:negate", 0)
+
+        # since the machine is stack-oriented, we can either roll the 2 values
+        # into their proper place for comparison, or we can just invert their
+        # boolean operations. Since 1 > 2 will have 2 as the reciever object
+        # on the stack, it will actually perform 2 > 1 if we do not also
+        # invert the operation
+        elif node.op == ">":
+            codegen.add_instruction(f"call {node.left.get_type()}:less", -1)
+
+        elif node.op == ">=":
+            codegen.add_instruction(f"call {node.left.get_type()}:less_eq", -1)
             
+        elif node.op == "<":
+            codegen.add_instruction(f"call {node.left.get_type()}:greater", -1)
+
+        elif node.op == "<=":
+            codegen.add_instruction(f"call {node.left.get_type()}:greater_eq", -1)
         
     def generate_call(self, node):
         codegen.add_instruction(f"call {node.get_type()}:{node.function}", 0)
@@ -222,6 +238,21 @@ class BinaryOpNode(ASTNode):
         self.right.generate(visitor)
         return visitor.generate_binary(self)
 
+class UnusedStmtNode(ASTNode):
+    def __init__(self, statement: ASTNode):
+        self.statement = statement
+
+    def r_eval(self):
+        pass
+
+    def get_type(self):
+        return self.statement.get_type()
+
+    def generate(self, visitor: ASTVisitor):
+        self.statement.generate(visitor)
+        return visitor.generate_unused(self)
+        
+        
 class CallNode(ASTNode):
     def __init__(self, callee: ASTNode,
                  function: str, params: list):
@@ -271,7 +302,7 @@ class AssignmentNode(ASTNode):
         pass
         
     def get_type(self):
-        return self.right.get_type()
+        return tables.get_type(self.left.var)
 
     def generate(self, visitor: ASTVisitor):
         self.left.generate(visitor)
@@ -291,8 +322,44 @@ class ComparisonNode(ASTNode):
         return "Bool"
 
     def generate(self, visitor):
+        self.left.generate(visitor)
+        self.right.generate(visitor)
+        return visitor.generate_comparison(self)
+
+class WhileNode(ASTNode):
+    def __init__(self, condition: ASTNode,
+                 block: ASTNode):
+
+        self.condition = condition
+        self.block = block
+
+    def r_eval(self):
         pass
 
+    def get_type(self):
+        pass
+
+    def generate(self, visitor):
+        return visitor.generate_while(self)
+        # # make the label
+        # compare = codegen.create_label("whilecmp")
+        # # generate a branch to the label
+        # codegen.add_jump(compare)
+        # # create the label for the while body
+        # body = codegen.create_label("whilebody")
+        # # generate the label
+        # codegen.add_label(body) 
+        # # generate the block
+        # self.block.generate(visitor)
+        # # generate the label
+        # codegen.add_label(compare) 
+        # # generate the condition
+        # self.condition.generate(visitor)
+        # # generate the jump instruction
+        # codegen.add_jump_if(body)
+        # # generate the end label
+        # codegen.add_label("end" + compare) 
+                 
 class BlockNode(ASTNode):
     def __init__(self, statements: ASTNode):
         self.statements = statements
@@ -353,6 +420,12 @@ class ASTBuilder(Transformer):
     def parameters(self, params, stmt):
         return [params, stmt]
     
+    def whilestmt(self, comparison, block):
+        return WhileNode(comparison, block)
+    
+    def unusedstmt(self, statement):
+        return UnusedStmtNode(statement)
+    
     def add(self, left, right):
         # print(f"{left} + {right}")
         return BinaryOpNode("+", left, right)
@@ -370,28 +443,28 @@ class ASTBuilder(Transformer):
         return BinaryOpNode("/", left, right)
 
     def or_op(self, left, right):
-        pass
+        return ComparisonNode(left, right, "||")
 
     def and_op(self, left, right):
-        pass
+        return ComparisonNode(left, right, "&&")
 
     def equal_compare(self, left, right):
-        pass
+        return ComparisonNode(left, right, "==")
 
     def notequal_compare(self, left, right):
-        pass
+        return ComparisonNode(left, right, "!=")
 
     def greater_than(self, left, right):
-        pass
+        return ComparisonNode(left, right, ">")
 
     def greater_than_eq(self, left, right):
-        pass
+        return ComparisonNode(left, right, ">=")
 
     def less_than(self, left, right):
-        pass
+        return ComparisonNode(left, right, "<")
 
     def less_than_eq(self, left, right):
-        pass
+        return ComparisonNode(left, right, "<=")
     
     def neg(self, expr):
         # print(f"-{expr}")

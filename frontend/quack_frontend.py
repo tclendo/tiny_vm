@@ -1,6 +1,7 @@
 from lark import Lark
 from quack_grammar import quack_grammar
-from quack_middle import ASTBuilder, ASTVisitor, codegen
+from quack_middle import ASTBuilder, ASTVisitor
+from quack_codegen import codegen
 
 import argparse
 
@@ -26,7 +27,7 @@ def main():
     # hacky way to get base filename for main class name
     try:
         mainclass = f_input.split('.')[0]
-        mainclass = mainclass.split('/')[1]
+        mainclass = mainclass.split('/')[2]
         # end hacky way to get base filename
         codegen.set_filename(mainclass)
     except:
@@ -48,7 +49,7 @@ def main():
     # Middle-end optimizations
     quack = quack_parser.parse(s)
     ast = ASTBuilder().transform(quack)
-    ast.generate(ASTVisitor())
+    ast.generate(codegen)
     # Back-end optimizations and godegen
     codegen.print_instructions(f_output)
         
