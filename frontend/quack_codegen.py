@@ -84,15 +84,23 @@ class QuackCodeGen(ASTVisitor):
             self.add_instruction(f"call {node.get_type()}:negate")
 
     def generate_while(self, node):
+        # make the label
         compare = self.create_label("whilecmp")
+        # generate a branch to the label
         self.add_jump(compare)
+        # create the label for the while body
         body = self.create_label("whilebody")
+        # generate the label
         self.add_label(body)
+        # generate the block
+        end = "end" + compare
         node.block.generate(self)
+        # generate the label
         self.add_label(compare)
-        node.condition.generate(self)
-        self.add_jump_if(body)
-        self.add_label("end" + compare)
+        # generate the condition
+        node.condition.c_eval(self, body, end)
+        # generate the end label
+        self.add_label(end)
         
     def generate_binary(self, node):
         if node.op == '-':
@@ -136,6 +144,9 @@ class QuackCodeGen(ASTVisitor):
 
         elif node.op == "<=":
             self.add_instruction(f"call {node.left.get_type()}:greater_eq")
+
+        elif node.op == "||":
+            node.c_eval(self)
         
     def generate_call(self, node):
         self.add_instruction(f"call {node.get_type()}:{node.function}")

@@ -118,26 +118,26 @@ class ASTNode():
     Base class for all AST nodes
     '''
     def r_eval(self):
-        raise NotImplementedError("Base class")
+        raise NotImplementedError()
 
     def l_eval(self):
-        raise NotImplementedError("Base class")
+        raise NotImplementedError()
         
-    def c_eval(self):
-        raise NotImplementedError("Base class")
+    def c_eval(self, visitor):
+        raise NotImplementedError()
 
     def get_type(self):
-        raise NotImplementedError("Base class")
+        raise NotImplementedError()
 
     def generate(self, visitor):
-        raise NotImplementedError("Base class")
+        raise NotImplementedError()
         
 class StringLiteralNode(ASTNode):
     def __init__(self, val: str):
         self.val = val
 
     def r_eval(self):
-        return self.val
+        return visitor.generate_string(self)
 
     def get_type(self):
         return "String"
@@ -150,7 +150,7 @@ class IntLiteralNode(ASTNode):
         self.val = val
 
     def r_eval(self):
-        return self.val
+        return visitor.generate_int(self)
 
     def get_type(self):
         return "Int"
@@ -163,7 +163,7 @@ class NothingLiteralNode(ASTNode):
         self.val = val
 
     def r_eval(self):
-        return self.val
+        return visitor.generate_nothing(self)
 
     def get_type(self):
         return "Nothing"
@@ -176,7 +176,7 @@ class BooleanLiteralNode(ASTNode):
         self.val = val
 
     def r_eval(self):
-        return self.val
+        return visitor.generate_bool(self)
 
     def get_type(self):
         return "Bool"
@@ -189,8 +189,8 @@ class VariableNode(ASTNode):
         self.var = var
 
     def r_eval(self):
-        return self.var
-    
+        return visitor.generate_var(self)
+        
     def get_type(self):
         return tables.get_type(self.var)
 
@@ -202,8 +202,14 @@ class UnaryOpNode(ASTNode):
         self.op = op
         self.child = child
         
+    def c_eval(self, visitor, true_branch, false_branch):
+        if self.op == '!':
+            self.child.generate(visitor)
+            visitor.add_jump_if_not(true_branch)
+
     def r_eval(self):
-        pass
+        self.child.generate(visitor)
+        return visitor.generate_unary(self)
 
     def get_type(self):
         return tables.get_type(self.child)
@@ -219,7 +225,9 @@ class BinaryOpNode(ASTNode):
         self.right = right
     
     def r_eval(self):
-        pass
+        self.left.generate(visitor)
+        self.right.generate(visitor)
+        return visitor.generate_binary(self)
 
     def get_type(self):
         l_type = self.left.get_type()
@@ -243,7 +251,8 @@ class UnusedStmtNode(ASTNode):
         self.statement = statement
 
     def r_eval(self):
-        pass
+        self.statement.generate(visitor)
+        return visitor.generate_unused(self)
 
     def get_type(self):
         return self.statement.get_type()
@@ -251,7 +260,6 @@ class UnusedStmtNode(ASTNode):
     def generate(self, visitor: ASTVisitor):
         self.statement.generate(visitor)
         return visitor.generate_unused(self)
-        
         
 class CallNode(ASTNode):
     def __init__(self, callee: ASTNode,
@@ -270,7 +278,11 @@ class CallNode(ASTNode):
                 self.params.append(element)
                     
     def r_eval(self):
-        pass
+        self.callee.generate(visitor)
+        for element in self.params:
+            element.generate(visitor)
+
+        return visitor.generate_call(self)
 
     def get_type(self):
         # TODO: type should actually be the function return signature
@@ -299,7 +311,9 @@ class AssignmentNode(ASTNode):
             # print(f"Set {self.left.var} type: {tables.get_type(self.left.var)}")
 
     def r_eval(self):
-        pass
+        self.left.generate(visitor)
+        self.right.generate(visitor)
+        return visitor.generate_assignment(self)
         
     def get_type(self):
         return tables.get_type(self.left.var)
@@ -316,7 +330,33 @@ class ComparisonNode(ASTNode):
         self.op = op
 
     def r_eval(self):
-        pass
+        self.left.generate(visitor)
+        self.right.generate(visitor)
+        return visitor.generate_comparison(self)
+
+    def c_eval(self, visitor, true_branch, false_branch):
+        # generate short-circuit 'or' comparison
+        if self.op == "||":
+            self.left.generate(visitor)
+            # jump to block if first one is true
+            visitor.add_jump_if(true_branch)
+            self.right.generate(visitor)
+            # jump to block if second one is true
+            visitor.add_jump_if(true_branch)
+
+        # generate short-circuit 'and' comparison
+        elif self.op == "&&":
+            self.left.generate(visitor)
+            # jump to end if first one is false
+            visitor.add_jump_if_not(false_branch)
+            self.right.generate(visitor)
+            # jump to block if second is true
+            visitor.add_jump_if(true_branch)
+
+        # otherwise there's no short-circuiting required
+        else:
+            self.generate(visitor)
+            visitor.add_jump_if(true_branch)
 
     def get_type(self):
         return "Bool"
@@ -334,38 +374,20 @@ class WhileNode(ASTNode):
         self.block = block
 
     def r_eval(self):
-        pass
+        return visitor.generate_while(self)
 
     def get_type(self):
         pass
 
     def generate(self, visitor):
         return visitor.generate_while(self)
-        # # make the label
-        # compare = codegen.create_label("whilecmp")
-        # # generate a branch to the label
-        # codegen.add_jump(compare)
-        # # create the label for the while body
-        # body = codegen.create_label("whilebody")
-        # # generate the label
-        # codegen.add_label(body) 
-        # # generate the block
-        # self.block.generate(visitor)
-        # # generate the label
-        # codegen.add_label(compare) 
-        # # generate the condition
-        # self.condition.generate(visitor)
-        # # generate the jump instruction
-        # codegen.add_jump_if(body)
-        # # generate the end label
-        # codegen.add_label("end" + compare) 
                  
 class BlockNode(ASTNode):
     def __init__(self, statements: ASTNode):
         self.statements = statements
 
     def r_eval(self):
-        pass
+        self.statements.generate(visitor)
 
     def get_type(self):
         return self.statements.get_type()
@@ -382,7 +404,8 @@ class ProgramNode(ASTNode):
         self.final = final 
 
     def r_eval(self):
-        pass
+        self.program.generate(visitor)
+        self.final.generate(visitor)
 
     def get_type(self):
         pass
@@ -393,10 +416,8 @@ class ProgramNode(ASTNode):
 
 @v_args(inline=True)    # Affects the signatures of the methods
 class ASTBuilder(Transformer):
-    from operator import add, sub, mul, truediv as div, neg
 
     def __init__(self):
-        # dictionary of all the elements and their types
         pass
 
     def prog(self, program, statement):
@@ -406,15 +427,12 @@ class ASTBuilder(Transformer):
         return BlockNode(statements)
     
     def assign_var_typ(self, name, typ, value):
-        # print(f"{name}: {typ} = {value}")
         return AssignmentNode(name, value, typ)
 
     def assign_var(self, name, value):
-        # print(f"{name} = {value}")
         return AssignmentNode(name, value)
 
     def call(self, callee, function, params=[]):
-        # print(f"{callee}.{function}()")
         return CallNode(callee, function, params)
 
     def parameters(self, params, stmt):
@@ -427,19 +445,15 @@ class ASTBuilder(Transformer):
         return UnusedStmtNode(statement)
     
     def add(self, left, right):
-        # print(f"{left} + {right}")
         return BinaryOpNode("+", left, right)
     
     def sub(self, left, right):
-        # print(f"{left} - {right}")
         return BinaryOpNode("-", left, right)
         
     def mul(self, left, right):
-        # print(f"{left} * {right}")
         return BinaryOpNode("*", left, right)
 
     def div(self, left, right):
-        # print(f"{left} / {right}")
         return BinaryOpNode("/", left, right)
 
     def or_op(self, left, right):
@@ -447,6 +461,9 @@ class ASTBuilder(Transformer):
 
     def and_op(self, left, right):
         return ComparisonNode(left, right, "&&")
+
+    def not_op(self, expr):
+        return UnaryOpNode("!", expr)
 
     def equal_compare(self, left, right):
         return ComparisonNode(left, right, "==")
@@ -467,29 +484,22 @@ class ASTBuilder(Transformer):
         return ComparisonNode(left, right, "<=")
     
     def neg(self, expr):
-        # print(f"-{expr}")
         return UnaryOpNode("-", expr)
         
     def var(self, name):
-        # print(f"{name}")
         return VariableNode(name)
 
     def number(self, val):
-        # print(f"{val}")
         return IntLiteralNode(val)
 
     def str_lit(self, text):
-        # print(f"{text}")
         return StringLiteralNode(text)
 
     def lit_nothing(self, nothing):
-        # print(f"{nothing}")
         return NothingLiteralNode()
 
     def lit_true(self, true="true"):
-        # print(f"{true}")
         return BooleanLiteralNode(true)
 
     def lit_false(self, false="false"):
-        # print(f"{false}")
         return BooleanLiteralNode(false)

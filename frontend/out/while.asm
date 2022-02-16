@@ -1,10 +1,13 @@
 .class while:Obj
 
 .method $constructor
-.local x,y
+.local x,z,y
 load x
 const 10
 store x
+load z
+const 5
+store z
 jump labelwhilecmp0
 labelwhilebody1:
 load y
@@ -32,11 +35,24 @@ const 1
 roll 1
 call Int:minus
 store x
+load z
+load z
+const 1
+roll 1
+call Int:minus
+store z
 load x
+call Int:print
+pop
+load z
 call Int:print
 pop
 labelwhilecmp0:
 load x
+const 1
+call Int:less
+jump_ifnot endlabelwhilecmp0
+load z
 const 1
 call Int:less
 jump_if labelwhilebody1
