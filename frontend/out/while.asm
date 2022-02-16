@@ -50,11 +50,7 @@ pop
 labelwhilecmp0:
 load x
 const 1
-call Int:less
-jump_ifnot endlabelwhilecmp0
-load z
-const 1
-call Int:less
-jump_if labelwhilebody1
+call Int:greater_eq
+jump_ifnot labelwhilebody1
 endlabelwhilecmp0:
 return 0
