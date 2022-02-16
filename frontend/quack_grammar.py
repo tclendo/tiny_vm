@@ -7,10 +7,10 @@ quack_grammar = """
 ?stmt: assignment ";"
 | r_expr ";" -> unusedstmt 
 | "while" condition block -> whilestmt
-| "if" condition block otherwise -> ifstmt
+| "if" condition block otherwise? -> ifstmt
 
-?otherwise: "else" block -> else
-| "elif" condition block otherwise -> ifstmt
+?otherwise: "else" block
+| "elif" condition block otherwise? -> ifstmt
 
 ?type: IDENT
 

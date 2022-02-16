@@ -366,6 +366,23 @@ class ComparisonNode(ASTNode):
         self.right.generate(visitor)
         return visitor.generate_comparison(self)
 
+class IfStmtNode(ASTNode):
+    def __init__(self, condition: ASTNode, block: ASTNode,
+                 otherwise: ASTNode):
+
+        self.condition = condition
+        self.block = block
+        self.otherwise = otherwise
+
+    def r_eval(self):
+        return visitor.generate_ifstmt(self)
+
+    def get_type(self):
+        pass
+
+    def generate(self, visitor):
+        return visitor.generate_ifstmt(self)
+    
 class WhileNode(ASTNode):
     def __init__(self, condition: ASTNode,
                  block: ASTNode):
@@ -440,6 +457,9 @@ class ASTBuilder(Transformer):
     
     def whilestmt(self, comparison, block):
         return WhileNode(comparison, block)
+    
+    def ifstmt(self, condition, block, otherwise=None):
+        return IfStmtNode(condition, block, otherwise)
     
     def unusedstmt(self, statement):
         return UnusedStmtNode(statement)

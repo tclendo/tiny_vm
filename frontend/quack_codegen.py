@@ -83,6 +83,29 @@ class QuackCodeGen(ASTVisitor):
         if node.op == '-':
             self.add_instruction(f"call {node.get_type()}:negate")
 
+    def generate_ifstmt(self, node):
+        # first, compare for the if node
+        compare = self.create_label("ifcmp")
+        self.add_jump(compare)
+        body = self.create_label("ifbody")
+        self.add_label(body)
+        node.block.generate(self)
+        end = "end" + compare
+        self.add_jump(end)
+        self.add_label(compare)
+        if node.otherwise is None:
+            node.condition.c_eval(self, body, end)
+        
+        # if there is an else node, jump to the else start
+        else:
+            els = self.create_label("else")
+            node.condition.c_eval(self, body, els)
+            self.add_label(els)
+            node.otherwise.generate(self)
+
+        # end of the if statement
+        self.add_label(end)
+        
     def generate_while(self, node):
         # make the label
         compare = self.create_label("whilecmp")

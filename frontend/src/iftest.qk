@@ -1,0 +1,13 @@
+x = 4;
+if x > 5 {
+  y = 1;
+  y.print();
+  x = 10;
+} elif x < 3 {
+  y = 5;
+  y.print();
+  x = 0;
+} else {
+  x.print();
+}
+x.print();
