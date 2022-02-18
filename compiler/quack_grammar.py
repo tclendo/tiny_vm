@@ -70,10 +70,13 @@ quack_grammar = """
 %import common.ESCAPED_STRING -> STRING
 %import common.NUMBER
 
-EOL: /\\n/
+EOL: /(\\n|\\r)/
 IDENT: /[_a-zA-Z][_a-zA-A0-9]*/
+COMMENT: "/*" /(.|\\n|\\r)+/ "*/"
+| "//" /(.)+/ EOL
 
 %import common.WS_INLINE
 %ignore WS_INLINE
 %ignore EOL
+%ignore COMMENT
 """
