@@ -16,6 +16,9 @@ class ASTNode():
     def check_type(self, visitor: ASTVisitor) -> str:
         raise NotImplementedError()
         
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        raise NotImplementedError()
+        
     def c_eval(self, visitor: ASTVisitor):
         raise NotImplementedError()
 
@@ -32,6 +35,9 @@ class StringLiteralNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         return self.get_type()
 
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        pass
+
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitString(self)
 
@@ -44,6 +50,9 @@ class IntLiteralNode(ASTNode):
 
     def check_type(self, visitor: ASTVisitor):
         return self.get_type()
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        pass
 
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitInt(self)
@@ -58,6 +67,9 @@ class NothingLiteralNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         return self.get_type()
 
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        pass
+
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitNothing(self)
 
@@ -70,6 +82,9 @@ class BooleanLiteralNode(ASTNode):
     
     def check_type(self, visitor: ASTVisitor):
         return self.get_type()
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        pass
 
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitBool(self)
@@ -85,6 +100,9 @@ class VariableNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         self.typ = tables.get_type(self.var)
         return self.typ
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        pass
 
     def set_type(self, typ: str):
         tables.set_type(self.var, typ)
@@ -104,6 +122,9 @@ class UnaryOpNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         self.typ = visitor.VisitUnary(self)
         return self.typ
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitUnary(self, init)
 
     def c_eval(self, visitor, true_branch, false_branch):
         if self.op == '!':
@@ -131,6 +152,9 @@ class BinaryOpNode(ASTNode):
         self.typ = visitor.VisitBinary(self)
         return self.typ
     
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitBinary(self, init)
+
     def generate(self, visitor: ASTVisitor):
         self.left.generate(visitor)
         self.right.generate(visitor)
@@ -142,6 +166,9 @@ class UnusedStmtNode(ASTNode):
     
     def check_type(self, visitor: ASTVisitor):
         return self.statement.check_type(visitor)
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return self.statement.check_init(visitor, init)
 
     def generate(self, visitor: ASTVisitor):
         self.statement.generate(visitor)
@@ -172,6 +199,9 @@ class CallNode(ASTNode):
         self.typ = visitor.VisitCall(self)
         return self.typ
 
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitCall(self, init)
+
     def generate(self, visitor: ASTVisitor):
         self.callee.generate(visitor)
         for element in self.params:
@@ -190,12 +220,15 @@ class AssignmentNode(ASTNode):
         
     def get_type(self):
         return self.typ
+
+    def set_type(self, typ: str):
+        self.typ = typ
     
     def check_type(self, visitor: ASTVisitor):
         return visitor.VisitAssignment(self)
 
-    def set_type(self, typ: str):
-        self.typ = typ
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitAssignment(self, init)
 
     def generate(self, visitor: ASTVisitor):
         self.left.generate(visitor)
@@ -238,6 +271,9 @@ class ComparisonNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         return visitor.VisitComparison(self)
             
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitComparison(self, init)
+
     def generate(self, visitor: ASTVisitor):
         self.left.generate(visitor)
         self.right.generate(visitor)
@@ -254,6 +290,9 @@ class IfStmtNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         return visitor.VisitIfStmt(self)
 
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitIfStmt(self, init)
+
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitIfStmt(self)
     
@@ -267,6 +306,9 @@ class WhileNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         return visitor.VisitWhile(self)
         
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        return visitor.VisitWhile(self, init)
+
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitWhile(self)
                  
@@ -276,6 +318,9 @@ class BlockNode(ASTNode):
 
     def check_type(self, visitor: ASTVisitor):
         self.statements.check_type(visitor)
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        self.statements.check_init(visitor, init)
         
     def generate(self, visitor: ASTVisitor):
         self.statements.generate(visitor)
@@ -291,6 +336,10 @@ class ProgramNode(ASTNode):
     def check_type(self, visitor: ASTVisitor):
         self.program.check_type(visitor)
         self.final.check_type(visitor)
+
+    def check_init(self, visitor: ASTVisitor, init: dict):
+        self.program.check_init(visitor, init)
+        self.final.check_init(visitor, init)
 
     def generate(self, visitor: ASTVisitor):
         self.program.generate(visitor)

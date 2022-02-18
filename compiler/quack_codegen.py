@@ -173,7 +173,7 @@ class QuackCodeGen(ASTVisitor):
             node.c_eval(self)
         
     def VisitCall(self, node: qm.CallNode):
-        self.add_instruction(f"call {node.get_type()}:{node.function}")
+        self.add_instruction(f"call {node.callee.get_type()}:{node.function}")
 
     def VisitUnused(self, node: qm.UnusedStmtNode):
         # an unused stmt just needs to pop an item off

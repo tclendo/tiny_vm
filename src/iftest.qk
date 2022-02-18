@@ -5,8 +5,7 @@ if x > 5 {
   x = 10;
 } elif x < 3 {
   y = 5;
-  y.print();
-  x = 0;
+  x = "hello";
 } else {
   x.print();
 }

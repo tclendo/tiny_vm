@@ -18,7 +18,7 @@ const 1
 call Int:plus
 store y
 load y
-call Nothing:print
+call Int:print
 pop
 labelwhilecmp2:
 load y
@@ -33,12 +33,12 @@ roll 1
 call Int:minus
 store x
 load x
-call Nothing:print
+call Int:print
 pop
 labelwhilecmp0:
 load x
 const 1
-call Int:greater
-jump_ifnot labelwhilebody1
+call Int:less_eq
+jump_if labelwhilebody1
 endlabelwhilecmp0:
 return 0

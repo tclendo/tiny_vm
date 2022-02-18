@@ -2,6 +2,7 @@ from lark import Lark
 from quack_grammar import quack_grammar
 from quack_middle import ASTBuilder, ASTVisitor
 from quack_types import typechecker
+from quack_checks import initialization_check
 from quack_codegen import codegen
 
 import argparse
@@ -49,6 +50,9 @@ def main():
     # Middle-end basic optimizations
     ast = ASTBuilder().transform(quack)
 
+    # check for variable inits before uses
+    ast.check_init(initialization_check, {})
+    
     # run the typechecker and more middle end optimizations
     ast.check_type(typechecker)
 
