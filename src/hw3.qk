@@ -1,26 +1,46 @@
 x = 5;
 y = "hello!";
+
+// show that while loops work
 while x > 1 {
-  y.print();
-  "\n".print();
-  x.print();
-  "\n".print();
-  x = x - 1;
+  temp: Int = 3;
+  while temp != 0 and x != 0 {
+    temp.print();
+    "\n".print();
+    x.print();
+    "\n".print();
+    x = x - 1;
+    temp = temp + 1;
+  }
 }
 
-x.print();
-"\n".print();
-
 z = "what's up?";
-"\n".print();
+
+// show that if statements work
 if z == y {
   "Z is the same as y!".print();
   "\n".print();
-} else {
-  a = 10;
-  a.print();
+
+} elif y == "no" {
+  "Y is ".print();
+  y.print();
   "\n".print();
+
+} else {
+  done: Bool = false;
+  if not done {
+    done.print();
+    "\n".print();
+
+  } else {
+    "done is somehow true!".print();
+    "\n".print();
+
+  }
 }
 
-z.print();
-"\n".print();
+// final
+if x < 5 or x > 10 {
+  z.print();
+  "\n".print();
+}

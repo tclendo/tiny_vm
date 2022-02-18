@@ -25,3 +25,15 @@ Homework 2 saw the extension of our toy calculator to behave in certain ways lik
 	1. In the frontend folder, there is a test.txt file that can be read by the quack_frontend.py file to generate an asm file. To generate the asm file, simply run python3 quack_frontend.py -i=hw2.qk -o=sample.asm
 	2. In the repository's home folder, run 'python3 assemble.py frontend/sample.asm OBJ/Sample.json' to generate the bytecode for the virtual machine in the OBJ directory.
 	3. To run the code, simply run 'make' and then 'bin/tiny_vm -L OBJ Sample' and then the VM will run your code!
+
+## HW3 Changes
+
+Homework 3 now has type checking and type inference, variable initialization checks, while loops, if/elif/else statements, short-circuit boolean operations, and a bunch of other cool stuff. The code has been refactored into multiple files, and there will probably be even more refactoring for the next sprint. To compile your .qk files, you MUST place them in the src/ directory. You must also be able to run bash scripts, and have permissions enabled for quack. To compile a source file, simply type
+
+	1. ./quack <filename>
+
+If you get an error saying permission denied, try running
+
+	1. bash quack <filename>
+
+Be sure to omit the .qk extension, it's not needed, and will not compile if you don't. "bash quack.sh hw3.qk" will not work, but "bash quack.sh hw3" will work. Also, it will automatically compile the proper object file name based on the name passed into the compiler.

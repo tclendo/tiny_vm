@@ -39,7 +39,7 @@ class QuackInitializationCheck(ASTVisitor):
 
     def VisitUnary(self, node: qm.UnaryOpNode, init: set):
         if isinstance(node.child, qm.VariableNode):
-            if node.left.var not in init:
+            if node.child.var not in init:
                 raise ValueError(f"{node.left.var} not initialized before use")
 
         else:
