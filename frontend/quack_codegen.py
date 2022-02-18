@@ -1,4 +1,6 @@
-from quack_middle import tables, ASTVisitor, ASTNode
+import quack_middle as qm
+from quack_visitor import ASTVisitor
+from quack_tables import tables
 
 class QuackCodeGen(ASTVisitor):
     """
@@ -7,9 +9,8 @@ class QuackCodeGen(ASTVisitor):
     may modify this codegen class.
     """
 
-    def __init__(self, tables):
+    def __init__(self):
         # instruction stream that will be dumped at the end
-        self.tables = tables
         self.instructions = []
         self.pusharg = 0
         self.filename = ""
@@ -47,7 +48,7 @@ class QuackCodeGen(ASTVisitor):
             print(".class {}:Obj".format(self.filename))
             print()
             print(".method $constructor")
-            print(".local {}".format(','.join(self.tables.get_variables())))
+            print(".local {}".format(','.join(tables.get_variables())))
             for element in self.instructions:
                 print(element)
 
@@ -62,7 +63,7 @@ class QuackCodeGen(ASTVisitor):
                 f.write(".class {}:Obj\n".format(self.filename))
                 f.write("\n")
                 f.write(".method $constructor\n")
-                f.write(".local {}".format(','.join(self.tables.get_variables())))
+                f.write(".local {}".format(','.join(tables.get_variables())))
                 f.write('\n')
                 # print(f".local {','.join(self.vars.keys())}")
                 for instruction in self.instructions:
@@ -79,11 +80,11 @@ class QuackCodeGen(ASTVisitor):
 ### These methods are for recursively generating code
 ### from the ASTNodes 
 
-    def generate_unary(self, node):
+    def VisitUnary(self, node: qm.UnaryOpNode):
         if node.op == '-':
             self.add_instruction(f"call {node.get_type()}:negate")
 
-    def generate_ifstmt(self, node):
+    def VisitIfStmt(self, node: qm.IfStmtNode):
         # first, compare for the if node
         compare = self.create_label("ifcmp")
         self.add_jump(compare)
@@ -106,7 +107,7 @@ class QuackCodeGen(ASTVisitor):
         # end of the if statement
         self.add_label(end)
         
-    def generate_while(self, node):
+    def VisitWhile(self, node: qm.WhileNode):
         # make the label
         compare = self.create_label("whilecmp")
         # generate a branch to the label
@@ -125,7 +126,7 @@ class QuackCodeGen(ASTVisitor):
         # generate the end label
         self.add_label(end)
         
-    def generate_binary(self, node):
+    def VisitBinary(self, node: qm.BinaryOpNode):
         if node.op == '-':
             self.add_instruction(f"roll 1")
             self.add_instruction(f"call {node.get_type()}:minus")
@@ -140,10 +141,10 @@ class QuackCodeGen(ASTVisitor):
             self.add_instruction(f"call {node.get_type()}:times")
 
             
-    def generate_assignment(self, node):
+    def VisitAssignment(self, node: qm.AssignmentNode):
         self.add_instruction(f"store {node.left.var}")
 
-    def generate_comparison(self, node):
+    def VisitComparison(self, node: qm.ComparisonNode):
         if node.op == '==':
             self.add_instruction(f"call {node.left.get_type()}:equals")
 
@@ -171,27 +172,27 @@ class QuackCodeGen(ASTVisitor):
         elif node.op == "||":
             node.c_eval(self)
         
-    def generate_call(self, node):
+    def VisitCall(self, node: qm.CallNode):
         self.add_instruction(f"call {node.get_type()}:{node.function}")
 
-    def generate_unused(self, node):
+    def VisitUnused(self, node: qm.UnusedStmtNode):
         # an unused stmt just needs to pop an item off
         # the stack
         self.add_instruction("pop")
         
-    def generate_var(self, node):
+    def VisitVar(self, node: qm.VariableNode):
         self.add_instruction(f"load {node.var}")
 
-    def generate_string(self, node):
+    def VisitString(self, node: qm.StringLiteralNode):
         self.add_instruction(f"const {node.val}")
         
-    def generate_int(self, node):
+    def VisitInt(self, node: qm.IntLiteralNode):
         self.add_instruction(f"const {node.val}")
 
-    def generate_bool(self, node):
+    def VisitBool(self, node: qm.BooleanLiteralNode):
         self.add_instruction(f"const {node.val}")
 
-    def generate_nothing(self, node):
+    def VisitNothing(self, node: qm.NothingLiteralNode):
         self.add_instruction(f"const {node.val}")
 
-codegen = QuackCodeGen(tables)
+codegen = QuackCodeGen()

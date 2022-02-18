@@ -11,7 +11,7 @@ load y
 const 1
 store y
 load y
-call Int:print
+call Nothing:print
 pop
 load x
 const 10
@@ -29,7 +29,7 @@ load y
 const 5
 store y
 load y
-call Int:print
+call Nothing:print
 pop
 load x
 const 0
@@ -42,11 +42,11 @@ call Int:greater
 jump_if labelifbody4
 labelelse5:
 load x
-call Int:print
+call Nothing:print
 pop
 endlabelifcmp3:
 endlabelifcmp0:
 load x
-call Int:print
+call Nothing:print
 pop
 return 0

@@ -1,17 +1,17 @@
 default_class_map = {
     "Obj": {
-        "superclass": "$",
+        "superclass": "Obj",
         "field_list": {},
         "method_returns": {
             "$constructor": "Obj",
             "string": "String",
             "print": "Nothing",
-            "equals": "Boolean"
+            "equals": "Bool"
         },
         "method_args": {
-            "$constructor": [],
-            "string": [],
-            "print": [],
+            "$constructor": ["Obj"],
+            "string": ["Obj"],
+            "print": ["Obj"],
             "equals": ["Obj"]
         }
     },
@@ -22,63 +22,60 @@ default_class_map = {
             "$constructor": "Int",
             "string": "String",
             "print": "Nothing",
+            "equals": "Bool",
+            "less": "Bool",
+            "greater": "Bool",
+            "less_eq": "Bool",
+            "greater_eq": "Bool",
+            "negate": "Int",
             "plus": "Int",
             "minus": "Int",
             "times": "Int",
             "divide": "Int",
-            "negate": "Int",
-            "equals": "Boolean",
-            "more": "Boolean",
-            "less": "Boolean",
-            "atleast": "Boolean",
-            "atmost": "Boolean"
-        },
-        "method_args": {
-            "$constructor": ["TODO"],
-            "string": [],
-            "print": [],
-            "plus": ["Int"],
-            "minus": ["Int"],
-            "times": ["Int"],
-            "divide": ["Int"],
-            "negate": [],
-            "equals": ["Obj"],
-            "less": ["Obj"],
-            "more": ["Obj"],
-            "atmost": ["Obj"],
-            "atleast": ["Obj"]
-        }
-    },
-    "Boolean": {
-        "superclass": "Obj",
-        "field_list": {},
-        "method_returns": {
-            "$constructor": "Boolean",
-            "string": "String",
-            "print": "Nothing",
-            "equals": "Boolean",
-            "negate": "Boolean"
         },
         "method_args": {
             "$constructor": [],
             "string": [],
             "print": [],
             "equals": ["Obj"],
-            "negate": []
+            "less": ["Obj"],
+            "greater": ["Obj"],
+            "less_eq": ["Obj"],
+            "greater_eq": ["Obj"],
+            "negate": ["Int"],
+            "plus": ["Int"],
+            "minus": ["Int"],
+            "times": ["Int"],
+            "divide": ["Int"],
+        }
+    },
+    "Bool": {
+        "superclass": "Obj",
+        "field_list": {},
+        "method_returns": {
+            "$constructor": "Bool",
+            "string": "String",
+            "print": "Nothing",
+            "equals": "Bool",
+            "negate": "Bool"
+        },
+        "method_args": {
+            "$constructor": [],
+            "string": [],
+            "print": [],
+            "equals": ["Obj"],
+            "negate": ["Bool"]
         }
     },
     "String": {
         "superclass": "Obj",
-        "field_list": [],
+        "field_list": {},
         "method_returns": {
             "$constructor": "String",
             "string": "String",
             "print": "Nothing",
-            "equals": "Boolean",
-            "less": "Boolean",
-            "more": "Boolean",
-            "atleast": "Boolean",
-            "atmost": "Boolean",
+            "equals": "Bool",
+            "less": "Bool",
             "plus": "String"
         },
         "method_args": {
@@ -87,10 +84,23 @@ default_class_map = {
             "print": [],
             "equals": ["Obj"],
             "less": ["Obj"],
-            "more": ["Obj"],
-            "atleast": ["Obj"],
-            "atmost": ["Obj"],
             "plus": ["String"]
+        }
+    },
+    "Nothing" : {
+        "superclass": "Obj",
+        "field_list": {},
+        "method_returns": {
+            "$constructor": "Nothing",
+            "string": "String",
+            "print": "String",
+            "equals": "String"
+        },
+        "method_args": {
+            "$constructor": [],
+            "string": [],
+            "print": [],
+            "equals": []
         }
     }
 }

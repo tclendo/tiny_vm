@@ -1,34 +1,47 @@
-import quack_middle
 ###
 # Our AST Visitor pattern class
 ###
 
 class ASTVisitor():
     def __init__(self):
+        raise NotImplementedError()
 
-    def visit_unary(self, node: UnaryOpNode):
-        print("UnaryOpNode")
-
-    def visit_binary(self, node: BinaryOpNode):
-        print("BinaryOpNode")
-
-    def visit_assignment(self, node: AssignmentNode):
-        print("AssignmentNode")
+    def VisitUnary(self, node):
+        raise NotImplementedError()
         
-    def visit_call(self, node: CallNode):
-        print("CallNode")
+    def VisitIfStmt(self, node):
+        raise NotImplementedError()
 
-    def visit_var(self, node: VariableNode):
-        print("VariableNode")
-
-    def visit_string(self, node: StringLiteralNode):
-        print("StringLiteralNode")
+    def VisitWhile(self, node):
+        raise NotImplementedError()
         
-    def visit_int(self, node: IntLiteralNode):
-        print("IntLiteralNode")
+    def VisitBinary(self, node):
+        raise NotImplementedError()
 
-    def visit_bool(self, node: BooleanLiteralNode):
-        print("BooleanLiteralNode")
+    def VisitAssignment(self, node):
+        raise NotImplementedError()
+        
+    def VisitComparison(self, node):
+        raise NotImplementedError()
+        
+    def VisitCall(self, node):
+        raise NotImplementedError()
 
-    def visit_nothing(self, node: NothingLiteralNode):
-        print("NothingLiteralNode")
+    def VisitUnused(self, node):
+        raise NotImplementedError()
+        
+    def VisitVar(self, node):
+        raise NotImplementedError()
+        
+    def VisitString(self, node):
+        raise NotImplementedError()
+        
+    def VisitInt(self, node):
+        raise NotImplementedError()
+
+    def VisitBool(self, node):
+        raise NotImplementedError()
+
+    def VisitNothing(self, node):
+        raise NotImplementedError()
+        

@@ -1,6 +1,7 @@
 from lark import Lark
 from quack_grammar import quack_grammar
 from quack_middle import ASTBuilder, ASTVisitor
+from quack_types import typechecker
 from quack_codegen import codegen
 
 import argparse
@@ -12,6 +13,9 @@ parser.add_argument('-i', '--input', default=None,
                     help="Specify input file name, otherwise will take lines from standard input.")
 parser.add_argument('-o', '--output', default=None,
                     help="Specify output file name, otherwise will print to standard output.")
+parser.add_argument('-c', '--class', default=None,
+                    help="Specify class name. Must match <class>.qk")
+
 args = parser.parse_args()
 
 quack_parser = Lark(quack_grammar, parser='lalr')
@@ -22,16 +26,10 @@ def main():
     arguments = vars(args)
     f_input: str = arguments["input"]
     f_output = arguments["output"]
+    clazz = arguments["class"]
     s = ""
 
-    # hacky way to get base filename for main class name
-    try:
-        mainclass = f_input.split('.')[0]
-        mainclass = mainclass.split('/')[2]
-        # end hacky way to get base filename
-        codegen.set_filename(mainclass)
-    except:
-        codegen.set_filename("")
+    codegen.set_filename(clazz)
 
     # if there exists an inputfilename
     if (f_input):
@@ -46,11 +44,18 @@ def main():
             except EOFError:
                 break
 
-    # Middle-end optimizations
     quack = quack_parser.parse(s)
+
+    # Middle-end basic optimizations
     ast = ASTBuilder().transform(quack)
-    ast.generate(codegen)
+
+    # run the typechecker and more middle end optimizations
+    ast.check_type(typechecker)
+
     # Back-end optimizations and godegen
+    ast.generate(codegen)
+
+    # print the code to corresponding output
     codegen.print_instructions(f_output)
         
 if __name__ == '__main__':
