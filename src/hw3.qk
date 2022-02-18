@@ -1,0 +1,19 @@
+x = 5;
+y = "hello!";
+while x > 1 {
+  y.print();
+  x.print();
+  x = x - 1;
+}
+
+x.print();
+
+z = 10;
+if z == y {
+  "Z is the same as y!\n".print();
+} else {
+  a = 10;
+  a.print();
+}
+
+z.print();

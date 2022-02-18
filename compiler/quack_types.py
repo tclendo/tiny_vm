@@ -5,8 +5,14 @@ from quack_tables import tables
 class QuackTypeChecker(ASTVisitor):
 
     def __init__(self):
-        pass
+        self.modified = False
 
+    def reset(self):
+        self.modified = False
+
+    def did_modify(self):
+        self.modified = True
+        
     def VisitWhile(self, node: qm.WhileNode):
         condition_type = node.condition.check_type(self)
         if condition_type != "Bool":
@@ -52,6 +58,7 @@ class QuackTypeChecker(ASTVisitor):
         # if l_type is none, the variable hasn't been
         # assigned a type yet. Let's do that here
         if l_type == None:
+            self.did_modify()
             node.left.set_type(r_type)
             node.set_type(r_type)
 
@@ -59,6 +66,7 @@ class QuackTypeChecker(ASTVisitor):
         # are different types, we find the most
         # specific common class
         elif l_type != r_type:
+            self.did_modify()
             new_type = tables.get_common_class(l_type, r_type)
             node.left.set_type(new_type)
             return new_type
@@ -71,13 +79,13 @@ class QuackTypeChecker(ASTVisitor):
         # but we will return the funtion signature
 
         # First, check that the callee type has this function
-        callee_type = node.callee.check_type(self)
-
         # TODO: streamline error handling here?
         # This returns function signature, but will throw error
         # if the function doesn't exist for this class
+        callee_type = node.callee.check_type(self)
         func_signature = tables.get_signature(callee_type, node.function)
 
+        # then check parameter types are correct
         param_types = []
         for element in node.params:
             param_types.append(tables.get_type(element))

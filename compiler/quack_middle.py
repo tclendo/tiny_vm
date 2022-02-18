@@ -92,14 +92,12 @@ class BooleanLiteralNode(ASTNode):
 class VariableNode(ASTNode):
     def __init__(self, var: str):
         self.var = var
-        self.typ = None
         
     def get_type(self):
-        return self.typ
+        return tables.get_type(self.var)
     
     def check_type(self, visitor: ASTVisitor):
-        self.typ = tables.get_type(self.var)
-        return self.typ
+        return tables.get_type(self.var)
 
     def check_init(self, visitor: ASTVisitor, init: set):
         pass

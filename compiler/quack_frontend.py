@@ -55,6 +55,9 @@ def main():
     
     # run the typechecker and more middle end optimizations
     ast.check_type(typechecker)
+    while typechecker.modified:
+        typechecker.reset()
+        ast.check_type(typechecker)
 
     # Back-end optimizations and godegen
     ast.generate(codegen)
