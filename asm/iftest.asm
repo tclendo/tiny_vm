@@ -43,9 +43,6 @@ call Int:print
 pop
 endlabelifcmp3:
 endlabelifcmp0:
-load y
-call Int:print
-pop
 load x
 call Obj:print
 pop

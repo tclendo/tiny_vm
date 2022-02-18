@@ -51,7 +51,7 @@ def main():
     ast = ASTBuilder().transform(quack)
 
     # check for variable inits before uses
-    ast.check_init(initialization_check, {})
+    ast.check_init(initialization_check, set())
     
     # run the typechecker and more middle end optimizations
     ast.check_type(typechecker)

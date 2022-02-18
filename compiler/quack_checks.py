@@ -7,14 +7,22 @@ class QuackInitializationCheck(ASTVisitor):
     def __init__(self):
         pass
 
-    def VisitWhile(self, node: qm.WhileNode, init):
+    def VisitWhile(self, node: qm.WhileNode, init: set):
         node.condition.check_init(self, init)
         node.block.check_init(self, init.copy())
 
-    def VisitIfStmt(self, node: qm.IfStmtNode, init):
-        pass
+    def VisitIfStmt(self, node: qm.IfStmtNode, init: set):
+        node.condition.check_init(self, init)
+        block_copy = init.copy()
+        node.block.check_init(self, block_copy)
+        if node.otherwise is not None:
+            otherwise_copy = init.copy()
+            node.otherwise.check_init(self, otherwise_copy)
+            new_vars = block_copy.intersection(otherwise_copy)
+            for element in new_vars:
+                init.add(element)
 
-    def VisitAssignment(self, node: qm.AssignmentNode, init):
+    def VisitAssignment(self, node: qm.AssignmentNode, init: set):
         if isinstance(node.right, qm.VariableNode):
             if node.left.var not in init:
                 raise ValueError(f"{node.left.var} not initialized before use")
@@ -22,14 +30,14 @@ class QuackInitializationCheck(ASTVisitor):
         else:
             node.right.check_init(self, init)
 
-        init[node.left.var] = True
+        init.add(node.left.var)
 
-    def VisitCall(self, node: qm.CallNode, init):
+    def VisitCall(self, node: qm.CallNode, init: set):
         if isinstance(node.callee, qm.VariableNode):
             if node.callee.var not in init:
-                raise ValueError(f"{node.left.var} not initialized before use")
+                raise ValueError(f"{node.callee.var} not initialized before use")
 
-    def VisitUnary(self, node: qm.UnaryOpNode, init):
+    def VisitUnary(self, node: qm.UnaryOpNode, init: set):
         if isinstance(node.child, qm.VariableNode):
             if node.left.var not in init:
                 raise ValueError(f"{node.left.var} not initialized before use")
@@ -37,7 +45,7 @@ class QuackInitializationCheck(ASTVisitor):
         else:
             node.child.check_init(self, init)
 
-    def VisitBinary(self, node: qm.BinaryOpNode, init):
+    def VisitBinary(self, node: qm.BinaryOpNode, init: set):
         if isinstance(node.left, qm.VariableNode):
             if node.left.var not in init:
                 raise ValueError(f"{node.left.var} not initialized before use")
@@ -52,7 +60,7 @@ class QuackInitializationCheck(ASTVisitor):
         else:
             node.right.check_init(self, init)
 
-    def VisitComparison(self, node: qm.ComparisonNode, init):
+    def VisitComparison(self, node: qm.ComparisonNode, init: set):
         if isinstance(node.left, qm.VariableNode):
             if node.left.var not in init:
                 raise ValueError(f"{node.left.var} not initialized before use")
