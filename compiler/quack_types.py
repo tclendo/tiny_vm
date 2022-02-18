@@ -48,6 +48,9 @@ class QuackTypeChecker(ASTVisitor):
                 raise TypeError(f"{l_type} is not 'Bool'")
             if r_type != "Bool":
                 raise TypeError(f"{r_type} is not 'Bool'")
+
+        else:
+            tables.check_binop(l_type, r_type, node.op)
             
         return "Bool"
 
@@ -98,8 +101,7 @@ class QuackTypeChecker(ASTVisitor):
         l_type = node.left.check_type(self)
         r_type = node.right.check_type(self)
         # TODO: type checking here to traverse type tree
-        if l_type != r_type:
-            raise TypeError(f"{l_type} and {r_type} different types")
+        tables.check_binop(l_type, r_type, node.op)
 
         node.typ = l_type
         return l_type

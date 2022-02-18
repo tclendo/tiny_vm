@@ -2,18 +2,25 @@ x = 5;
 y = "hello!";
 while x > 1 {
   y.print();
+  "\n".print();
   x.print();
+  "\n".print();
   x = x - 1;
 }
 
 x.print();
+"\n".print();
 
-z = 10;
+z = "what's up?";
+"\n".print();
 if z == y {
-  "Z is the same as y!\n".print();
+  "Z is the same as y!".print();
+  "\n".print();
 } else {
   a = 10;
   a.print();
+  "\n".print();
 }
 
 z.print();
+"\n".print();

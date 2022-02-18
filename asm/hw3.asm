@@ -13,8 +13,14 @@ labelwhilebody1:
 load y
 call String:print
 pop
+const "\n"
+call String:print
+pop
 load x
 call Int:print
+pop
+const "\n"
+call String:print
 pop
 load x
 load x
@@ -31,19 +37,28 @@ endlabelwhilecmp0:
 load x
 call Int:print
 pop
+const "\n"
+call String:print
+pop
 load z
-const 10
+const "what's up?"
 store z
+const "\n"
+call String:print
+pop
 jump labelifcmp2
 labelifbody3:
-const "Z is the same as y!\n"
+const "Z is the same as y!"
+call String:print
+pop
+const "\n"
 call String:print
 pop
 jump endlabelifcmp2
 labelifcmp2:
 load z
 load y
-call Int:equals
+call String:equals
 jump_if labelifbody3
 labelelse4:
 load a
@@ -52,8 +67,14 @@ store a
 load a
 call Int:print
 pop
+const "\n"
+call String:print
+pop
 endlabelifcmp2:
 load z
-call Int:print
+call String:print
+pop
+const "\n"
+call String:print
 pop
 return 0

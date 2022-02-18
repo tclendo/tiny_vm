@@ -37,11 +37,11 @@ default_class_map = {
             "$constructor": [],
             "string": [],
             "print": [],
-            "equals": ["Obj"],
-            "less": ["Obj"],
-            "greater": ["Obj"],
-            "less_eq": ["Obj"],
-            "greater_eq": ["Obj"],
+            "equals": ["Int"],
+            "less": ["Int"],
+            "greater": ["Int"],
+            "less_eq": ["Int"],
+            "greater_eq": ["Int"],
             "negate": ["Int"],
             "plus": ["Int"],
             "minus": ["Int"],
@@ -63,7 +63,7 @@ default_class_map = {
             "$constructor": [],
             "string": [],
             "print": [],
-            "equals": ["Obj"],
+            "equals": ["Bool"],
             "negate": ["Bool"]
         }
     },
@@ -82,8 +82,8 @@ default_class_map = {
             "$constructor": [],
             "string": [],
             "print": [],
-            "equals": ["Obj"],
-            "less": ["Obj"],
+            "equals": ["String"],
+            "less": ["String"],
             "plus": ["String"]
         }
     },

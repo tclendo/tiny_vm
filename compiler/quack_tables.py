@@ -49,7 +49,43 @@ class Tables():
             for i in range(0, size):
                 if params[i] != db_args[i]:
                     raise TypeError(f"Parameter types differ: {params[i]} : {db_args[i]}")
+        else:
+            # If it's 0, it's not specified, so compiler doesn't know
+            if len(db_args) != 0:
+                raise ValueError(f"Incorrect parameter amounts: was {size} expected {len(db_args)}")
                               
+    def check_binop(self, l_type, r_type, op):
+        method = None
+        if op == "+":
+            method = "plus"
+        elif op == "-":
+            method = "minus"
+        elif op == "*":
+            method = "times"
+        elif op == "/":
+            method = "divide"
+        elif op == "==":
+            method = "equals"
+        elif op == "!=":
+            # same arg types, so it's fine
+            method = "equals"
+        elif op == ">":
+            method = "greater"
+        elif op == ">=":
+            method = "greater_eq"
+        elif op == "<":
+            method = "less"
+        elif op == "<=":
+            method = "less_eq"
+        else:
+            raise ValueError("No binary operation exists for this")
+
+        args = self.objects[l_type]["method_args"][method]
+        if len(args) != 0:
+            # there's only 1 argument, so see if the types are equal
+            if r_type != args[0]:
+                raise TypeError(f"Parameter types differ: {r_type} : {args[0]}")
+            
             
     def get_class_map(self):
         return self.objects
