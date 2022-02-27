@@ -1,5 +1,25 @@
 quack_grammar = """
-?start: program
+?start: classes? program
+
+?classes: class
+| classes class -> classes
+
+?class: signature body -> clas
+
+?signature: "class" IDENT "(" formals ")" -> signature
+| "class" IDENT "(" formals ")" "extends" IDENT -> signature_ext
+
+?formals: formal
+| formals "," formal -> formals
+
+?formal: IDENT ":" type -> formal
+
+?body: program methods -> body
+
+?methods: method
+| methods method -> methods
+
+?method: "def" IDENT "(" formals ")" ":" type block -> method
 
 ?program: stmt
 | program stmt -> prog
@@ -23,11 +43,10 @@ quack_grammar = """
 
 ?l_expr: IDENT -> var
 
+?r_expr: not 
+
 ?params: l_expr
 | params "," l_expr -> parameters
-
-?r_expr: not 
-| r_expr "." IDENT "(" params? ")" -> call
 
 ?not: or
 | "not" comparison -> not_op
@@ -52,9 +71,13 @@ quack_grammar = """
 | sum "+" product   -> add
 | sum "-" product   -> sub
 
-?product: atom
+?product: access 
 | product "*" atom  -> mul
 | product "/" atom  -> div
+
+?access: atom
+| access "." IDENT -> field
+| access "." IDENT "(" params? ")" -> call
 
 ?atom: NUMBER      -> number
 | STRING -> str_lit

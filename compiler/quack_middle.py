@@ -351,7 +351,43 @@ class ASTBuilder(Transformer):
 
     def prog(self, program, statement):
         return ProgramNode(program, statement)
+
+    def classes(self, classes, clas):
+        # return ClassesNode(classes, clas)
+        pass
+
+    def clas(self, signature, body):
+        # return ClassNode(signature, body)
+        pass
+    
+    def signature(self, name, formals):
+        # return SignatureNode(name, formals, "Obj")
+        pass
+
+    def signature_ext(self, name, formals, ext):
+        # return SignatureNode(name, formals, ext)
+        pass
         
+    def formals(self, formals, formal):
+        # return [formals, formal]
+        pass
+
+    def formal(self, ident, typ):
+        # return FormalNode(ident, typ)
+        pass
+
+    def body(self, program, methods):
+        # return BodyNode(program, methods)
+        pass
+
+    def methods(self, methods, method):
+        # return MethodsNode(methods, method)
+        pass
+
+    def method(self, ident, formals, typ, block):
+        # return MethodNode(ident, formals, typ, block)
+        pass
+    
     def block(self, statements):
         return BlockNode(statements)
     
@@ -420,6 +456,10 @@ class ASTBuilder(Transformer):
         
     def var(self, name):
         return VariableNode(name)
+
+    def field(self, left, ident):
+        # return FieldNode(left, ident)
+        pass
 
     def number(self, val):
         return IntLiteralNode(val)
