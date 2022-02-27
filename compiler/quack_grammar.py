@@ -1,10 +1,11 @@
 quack_grammar = """
-?start: classes? program
+?start: classes program -> start
+| program
 
 ?classes: class
 | classes class -> classes
 
-?class: signature body -> clas
+?class: signature "{" body "}" -> clas
 
 ?signature: "class" IDENT "(" formals ")" -> signature
 | "class" IDENT "(" formals ")" "extends" IDENT -> signature_ext

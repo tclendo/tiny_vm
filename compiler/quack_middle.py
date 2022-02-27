@@ -108,6 +108,11 @@ class VariableNode(ASTNode):
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitVar(self)
 
+class FieldNode(ASTNode):
+    def __init__(self, left, ident):
+        self.left = left
+        self.ident = ident
+
 class UnaryOpNode(ASTNode):
     def __init__(self, op: str, child: ASTNode):
         self.op = op
@@ -323,6 +328,141 @@ class BlockNode(ASTNode):
     def generate(self, visitor: ASTVisitor):
         self.statements.generate(visitor)
 
+class FormalNode(ASTNode):
+    def __init__(self, ident: str, typ: str):
+        self.ident = ident
+        self.typ = typ
+
+    def check_type(self, visitor: ASTVisitor):
+        return self.typ
+
+    def check_init(self, visitor, init):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        pass
+    
+class MethodNode(ASTNode):
+    def __init__(self, ident: str,
+                 formals: list, typ: str,
+                 block: ASTNode):
+
+        self.ident = ident
+        self.typ = typ
+        self.block = block
+        self.formals = []
+
+        # flatten the formals list
+        for element in formals:
+            if type(element) == list:
+                for item in element:
+                    self.formals.append(item)
+
+            else:
+                self.formals.append(element)
+
+    def check_type(self, visitor: ASTVisitor):
+        pass
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        pass
+    
+class MethodsNode(ASTNode):
+    def __init__(self, methods: ASTNode, final: ASTNode):
+        self.methods = methods
+        self.final = final 
+        
+    def check_type(self, visitor: ASTVisitor):
+        self.methods.check_type(visitor)
+        self.final.check_type(visitor)
+        
+    def check_init(self, visitor: ASTVisitor, init: set):
+        self.methods.check_init(visitor, init)
+        self.final.check_init(visitor, init)
+        
+    def generate(self, visitor: ASTVisitor):
+        pass
+
+class BodyNode(ASTNode):
+    def __init__(self, program: ASTNode, methods: ASTNode):
+        self.program = program
+        self.methods = methods
+
+    def check_type(self, visitor: ASTVisitor):
+        self.program.check_type(visitor)
+        self.methods.check_type(visitor)
+        
+    def check_init(self, visitor: ASTVisitor, init: set):
+        self.program.check_init(visitor, init)
+        self.methods.check_init(visitor, init)
+        
+    def generate(self, visitor: ASTVisitor):
+        pass
+    
+class SignatureNode(ASTNode):
+    def __init__(self, name: ASTNode, formals: list,
+                 ext: str):
+
+        self.name = name
+        self.ext = ext
+        self.formals = []
+
+        # flatten the formals list
+        for element in formals:
+            if type(element) == list:
+                for item in element:
+                    self.formals.append(item)
+
+            else:
+                self.formals.append(element)
+
+    def check_type(self, visitor: ASTVisitor):
+        pass
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        pass
+
+class ClassNode(ASTNode):
+    def __init__(self, signature: ASTNode, body: ASTNode):
+        self.signature = signature
+        self.body = body
+
+    def check_type(self, visitor: ASTVisitor):
+        self.signature.check_type(visitor)
+        self.body.check_type(visitor)
+        
+    def check_init(self, visitor: ASTVisitor, init: set):
+        self.signature.check_init(visitor, init)
+        self.body.check_init(visitor, init)
+        
+    def generate(self, visitor: ASTVisitor):
+        self.signature.generate(visitor)
+        self.body.generate(visitor)
+    
+class ClassesNode(ASTNode):
+    def __init__(self, classes: ASTNode,
+                 final: ASTNode):
+        self.classes = classes
+        self.final = final 
+
+    def check_type(self, visitor: ASTVisitor):
+        self.classes.check_type(visitor)
+        self.final.check_type(visitor)
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        self.classes.check_init(visitor, init)
+        self.final.check_init(visitor, init)
+
+    def generate(self, visitor: ASTVisitor):
+        self.classes.generate(visitor)
+        self.final.generate(visitor)
+
 class ProgramNode(ASTNode):
 
     def __init__(self, program: ASTNode,
@@ -343,49 +483,69 @@ class ProgramNode(ASTNode):
         self.program.generate(visitor)
         self.final.generate(visitor)
 
+class StartNode(ASTNode):
+    def __init__(self, classes: ASTNode,
+                 program: ASTNode):
+
+        self.classes = classes 
+        self.program = program 
+
+    def check_type(self, visitor: ASTVisitor):
+        self.classes.check_type(visitor)
+        self.program.check_type(visitor)
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        self.classes.check_init(visitor, init)
+        self.program.check_init(visitor, init)
+
+    def generate(self, visitor: ASTVisitor):
+        self.classes.generate(visitor)
+        self.program.generate(visitor)
+
 @v_args(inline=True)    # Affects the signatures of the methods
 class ASTBuilder(Transformer):
 
     def __init__(self):
         pass
 
+    def start(self, classes, program):
+        return StartNode(classes, program)
+
     def prog(self, program, statement):
         return ProgramNode(program, statement)
 
     def classes(self, classes, clas):
-        # return ClassesNode(classes, clas)
-        pass
+        return ClassesNode(classes, clas)
 
     def clas(self, signature, body):
-        # return ClassNode(signature, body)
-        pass
+        return ClassNode(signature, body)
     
     def signature(self, name, formals):
-        # return SignatureNode(name, formals, "Obj")
+        return SignatureNode(name, formals, "Obj")
         pass
 
     def signature_ext(self, name, formals, ext):
-        # return SignatureNode(name, formals, ext)
+        return SignatureNode(name, formals, ext)
         pass
         
     def formals(self, formals, formal):
-        # return [formals, formal]
+        return [formals, formal]
         pass
 
     def formal(self, ident, typ):
-        # return FormalNode(ident, typ)
+        return FormalNode(ident, typ)
         pass
 
     def body(self, program, methods):
-        # return BodyNode(program, methods)
+        return BodyNode(program, methods)
         pass
 
     def methods(self, methods, method):
-        # return MethodsNode(methods, method)
+        return MethodsNode(methods, method)
         pass
 
     def method(self, ident, formals, typ, block):
-        # return MethodNode(ident, formals, typ, block)
+        return MethodNode(ident, formals, typ, block)
         pass
     
     def block(self, statements):
@@ -458,8 +618,7 @@ class ASTBuilder(Transformer):
         return VariableNode(name)
 
     def field(self, left, ident):
-        # return FieldNode(left, ident)
-        pass
+        return FieldNode(left, ident)
 
     def number(self, val):
         return IntLiteralNode(val)
