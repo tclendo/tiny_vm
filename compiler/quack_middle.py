@@ -113,6 +113,15 @@ class FieldNode(ASTNode):
         self.left = left
         self.ident = ident
 
+    def check_type(self, visitor: ASTVisitor):
+        pass
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        pass
+
 class UnaryOpNode(ASTNode):
     def __init__(self, op: str, child: ASTNode):
         self.op = op
@@ -350,19 +359,24 @@ class MethodNode(ASTNode):
         self.ident = ident
         self.typ = typ
         self.block = block
+        # keep track of formal nodes and just types
         self.formals = []
+        self.formal_types = []
 
-        # flatten the formals list
+        # flatten the formals list for nodes and types
         for element in formals:
             if type(element) == list:
                 for item in element:
                     self.formals.append(item)
+                    self.formal_types.append(item.typ)
 
             else:
                 self.formals.append(element)
+                self.formal_types.append(item.typ)
 
     def check_type(self, visitor: ASTVisitor):
-        pass
+        # add method to object hierarchy
+        tables.add_method(self.ident, self.formal_types, self.typ)
 
     def check_init(self, visitor: ASTVisitor, init: set):
         pass
@@ -381,7 +395,7 @@ class MethodsNode(ASTNode):
         
     def check_init(self, visitor: ASTVisitor, init: set):
         self.methods.check_init(visitor, init)
-        self.final.check_init(visitor, init)
+        return self.final.check_init(visitor, init)
         
     def generate(self, visitor: ASTVisitor):
         pass
@@ -392,7 +406,9 @@ class BodyNode(ASTNode):
         self.methods = methods
 
     def check_type(self, visitor: ASTVisitor):
+        # we will also set the types of the fields here
         self.program.check_type(visitor)
+        # add method info to the tables
         self.methods.check_type(visitor)
         
     def check_init(self, visitor: ASTVisitor, init: set):
@@ -403,7 +419,7 @@ class BodyNode(ASTNode):
         pass
     
 class SignatureNode(ASTNode):
-    def __init__(self, name: ASTNode, formals: list,
+    def __init__(self, name: str, formals: list,
                  ext: str):
 
         self.name = name
@@ -420,7 +436,18 @@ class SignatureNode(ASTNode):
                 self.formals.append(element)
 
     def check_type(self, visitor: ASTVisitor):
-        pass
+        # add the class signature information to our
+        # class tables
+        tables.add_object(self.name, self.ext)
+
+        # we will set the current object in the table
+        # singleton so that when we go into type checking
+        # the methods, we know what methods go to which
+        # class in our tables
+        tables.set_current_object(self.name)
+
+        # we just return the class name as the type
+        return self.name
 
     def check_init(self, visitor: ASTVisitor, init: set):
         pass
@@ -429,13 +456,15 @@ class SignatureNode(ASTNode):
         pass
 
 class ClassNode(ASTNode):
-    def __init__(self, signature: ASTNode, body: ASTNode):
+    def __init__(self, signature: SignatureNode, body: ASTNode):
         self.signature = signature
         self.body = body
+        self.typ = self.signature.name
 
     def check_type(self, visitor: ASTVisitor):
-        self.signature.check_type(visitor)
+        self.typ = self.signature.check_type(visitor)
         self.body.check_type(visitor)
+        return self.typ
         
     def check_init(self, visitor: ASTVisitor, init: set):
         self.signature.check_init(visitor, init)

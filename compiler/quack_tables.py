@@ -11,6 +11,11 @@ class Tables():
         # dictionary for objects and their methods
         self.objects = default_class_map
 
+        # current object for type checking and updating
+        # the class hierarchy information for user-added
+        # classes
+        self.current_object = None
+
     def set_type(self, item, typ):
         self.variables[item] = typ
         
@@ -31,6 +36,21 @@ class Tables():
     def get_variable_list(self) -> list:
         # used for codegen to generate .local{variables}
         return ([x for x in self.variables.keys()])
+
+    def add_object(self, name: str, ext: str):
+        # when adding an object, we need to copy everything over
+        # from the class it extends in the same order as well
+        self.objects[name] = {
+            "superclass": ext,
+            "field_list": self.objects[ext]["field_list"],
+            "method_returns": self.objects[ext]["method_returns"],
+            "method_args": self.objects[ext]["method_args"]}
+
+    def add_method(self, name: str, formals: list, typ: str):
+        self.objects[self.current_object]["method_returns"][name] = typ
+        self.objects[self.current_object]["method_args"][name] = formals
+    def set_current_object(self, name: str):
+        self.current_object = name
 
     def set_signature(self, func, typ):
         pass
