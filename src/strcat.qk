@@ -1,0 +1,1 @@
+("This is first\n" + "This is second\n").print();

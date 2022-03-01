@@ -135,9 +135,11 @@ class QuackCodeGen(ASTVisitor):
             self.add_instruction(f"call {node.get_type()}:divide")
 
         elif node.op == '+':
+            self.add_instruction(f"roll 1")
             self.add_instruction(f"call {node.get_type()}:plus")
 
         elif node.op == '*':
+            self.add_instruction(f"roll 1")
             self.add_instruction(f"call {node.get_type()}:times")
 
             
@@ -178,8 +180,10 @@ class QuackCodeGen(ASTVisitor):
     def VisitUnused(self, node: qm.UnusedStmtNode):
         # an unused stmt just needs to pop an item off
         # the stack
-        self.add_instruction("pop")
-        
+        # OKAY APPARENTLY WE DON'T ???
+        # self.add_instruction("pop")
+        pass
+
     def VisitVar(self, node: qm.VariableNode):
         self.add_instruction(f"load {node.var}")
 

@@ -75,4 +75,14 @@ class QuackInitializationCheck(ASTVisitor):
         else:
             node.right.check_init(self, init)
 
+    def VisitMethod(self, node: qm.MethodNode, init: set):
+        with_formals = init
+        for element in node.formals:
+            with_formals.add(element.ident)
+
+        node.block.check_init(self, with_formals)
+
+    def VisitBody(self, node: qm.BodyNode, init: set):
+        pass
+        
 initialization_check = QuackInitializationCheck()

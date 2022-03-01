@@ -379,7 +379,7 @@ class MethodNode(ASTNode):
         tables.add_method(self.ident, self.formal_types, self.typ)
 
     def check_init(self, visitor: ASTVisitor, init: set):
-        pass
+        visitor.VisitMethod(self, init)
 
     def generate(self, visitor: ASTVisitor):
         pass
@@ -412,8 +412,7 @@ class BodyNode(ASTNode):
         self.methods.check_type(visitor)
         
     def check_init(self, visitor: ASTVisitor, init: set):
-        self.program.check_init(visitor, init)
-        self.methods.check_init(visitor, init)
+        visitor.VisitBody(self, init)
         
     def generate(self, visitor: ASTVisitor):
         pass
