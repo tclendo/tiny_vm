@@ -17,16 +17,12 @@ jump labelwhilecmp2
 labelwhilebody3:
 load temp
 call Int:print
-pop
 const "\n"
 call String:print
-pop
 load x
 call Int:print
-pop
 const "\n"
 call String:print
-pop
 load x
 load x
 const 1
@@ -36,6 +32,7 @@ store x
 load temp
 load temp
 const 1
+roll 1
 call Int:plus
 store temp
 labelwhilecmp2:
@@ -63,10 +60,8 @@ jump labelifcmp4
 labelifbody5:
 const "Z is the same as y!"
 call String:print
-pop
 const "\n"
 call String:print
-pop
 jump endlabelifcmp4
 labelifcmp4:
 load z
@@ -78,13 +73,10 @@ jump labelifcmp7
 labelifbody8:
 const "Y is "
 call String:print
-pop
 load y
 call String:print
-pop
 const "\n"
 call String:print
-pop
 jump endlabelifcmp7
 labelifcmp7:
 load y
@@ -99,10 +91,8 @@ jump labelifcmp10
 labelifbody11:
 load done
 call Bool:print
-pop
 const "\n"
 call String:print
-pop
 jump endlabelifcmp10
 labelifcmp10:
 load done
@@ -110,10 +100,8 @@ jump_ifnot labelifbody11
 labelelse12:
 const "done is somehow true!"
 call String:print
-pop
 const "\n"
 call String:print
-pop
 endlabelifcmp10:
 endlabelifcmp7:
 endlabelifcmp4:
@@ -121,10 +109,8 @@ jump labelifcmp13
 labelifbody14:
 load z
 call String:print
-pop
 const "\n"
 call String:print
-pop
 jump endlabelifcmp13
 labelifcmp13:
 load x

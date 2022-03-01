@@ -28,12 +28,12 @@ Homework 2 saw the extension of our toy calculator to behave in certain ways lik
 
 ## HW3 Changes
 
-Homework 3 now has type checking and type inference, variable initialization checks, while loops, if/elif/else statements, short-circuit boolean operations, and a bunch of other cool stuff. The code has been refactored into multiple files, and there will probably be even more refactoring for the next sprint. To compile your .qk files, you MUST place them in the src/ directory. You must also be able to run bash scripts. To compile a source file, simply type
+Homework 3 now has type checking and type inference, variable initialization checks, while loops, if/elif/else statements, short-circuit boolean operations, and a bunch of other cool stuff. The code has been refactored into multiple files, and there will probably be even more refactoring for the next sprint. To compile a quack program, run the following command:
 
-	1. ./quack <filename>
+	1. ./quack <filename>.qk <run>?
 
 If you get an error saying permission denied, try running
 
-	1. bash quack <filename>
+	1. bash quack <filename> <run>?
 
-Be sure to omit the .qk extension, it's not needed, and will not compile if you don't. "bash quack hw3.qk" will not work, but "bash quack hw3" will work. Also, it will automatically compile the proper object file name based on the name passed into the compiler.
+If you add the optional 'run' parameter, it will run the code on the tiny_vm as well (as long as it exists). It will also automatically compile the proper object file name based on the name passed into the compiler.

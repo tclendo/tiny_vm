@@ -1,0 +1,6 @@
+x = "hello";
+if x {
+  x.print();
+} else {
+  "Good assignment\n".print();
+}

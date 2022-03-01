@@ -1,14 +1,21 @@
 #!/bin/bash
 
-python3 compiler/quack_frontend.py -i=src/$1.qk -o=asm/$1.asm -c=$1;
+srcname=`basename $1 .qk`
+
+python3 compiler/quack_frontend.py -i=$1 -o=asm/${srcname}.asm -c=${srcname};
 
 if [ $? == 0 ]
 then
-	echo "Compiled $1.qk -> $1.asm";
-	python3 assemble.py asm/$1.asm OBJ/$1.json;
+	echo "Compiled $1 -> ${srcname}.asm";
+	python3 assemble.py asm/${srcname}.asm OBJ/${srcname}.json;
+
 	if [ $? == 0 ]
 	then
-		echo "Assembled $1.asm -> $1.json";
+		echo "Assembled ${srcname}.asm -> ${srcname}.json";
+		if [ $# -eq 2 ]
+		then
+			bin/tiny_vm -L OBJ ${srcname}
+		fi
 		echo "Done";
 	else
 		echo "Error assembling. Aborted";
