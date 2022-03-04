@@ -8,26 +8,33 @@ class Tables():
     def __init__(self):
         # dictionary for variable types
         self.variables = {}
+        self.arguments = {}
         # dictionary for objects and their methods
         self.objects = default_class_map
-
         # current object for type checking and updating
         # the class hierarchy information for user-added
         # classes
         self.current_object = None
 
+        self.mainfilename = ""
+
+    def set_main(self, name):
+        self.mainfilename = name
+        self.variables[self.mainfilename] = {}
+        self.current_object = self.mainfilename
+        
     def set_type(self, item, typ):
-        self.variables[item] = typ
+        self.variables[self.current_object][item] = typ
         
     def get_type(self, item):
         try:
-            return self.variables[item]
+            return self.variables[self.current_object][item]
 
         except:
-            raise NameError(f"Variable {item} not found in table.")
+            raise NameError(f"In class \"{self.current_object}\": Variable \"{item}\" not found in table.")
 
     def get_variables(self):
-        return self.variables
+        return self.variables[self.current_object]
 
     def set_variables(self, var_dict: dict):
         for element in var_dict.keys():
@@ -42,18 +49,19 @@ class Tables():
         # from the class it extends in the same order as well
         self.objects[name] = {
             "superclass": ext,
-            "field_list": self.objects[ext]["field_list"],
+            "field_list": set(self.objects[ext]["field_list"]),
             "method_returns": self.objects[ext]["method_returns"],
             "method_args": self.objects[ext]["method_args"]}
+
+        # also add this class to the variable namespace
+        # dictionary
+        self.variables[name] = {}
 
     def add_method(self, name: str, formals: list, typ: str):
         self.objects[self.current_object]["method_returns"][name] = typ
         self.objects[self.current_object]["method_args"][name] = formals
     def set_current_object(self, name: str):
         self.current_object = name
-
-    def set_signature(self, func, typ):
-        pass
 
     def get_signature(self, typ, func):
         try:
@@ -73,6 +81,18 @@ class Tables():
             # If it's 0, it's not specified, so compiler doesn't know
             if len(db_args) != 0:
                 raise ValueError(f"Incorrect parameter amounts: was {size} expected {len(db_args)}")
+
+    def set_arguments(self, clas, func, params):
+        self.params[clas][func] = params
+
+    def get_parameters(self, clas, func):
+        return self.params[clas][func]
+
+    def set_field(self, field):
+        self.objects[self.current_object]["field_list"].add(field)
+
+    def get_fields(self, clas):
+        return self.objects[clas]["field_list"]
                               
     def check_binop(self, l_type, r_type, op):
         method = None

@@ -4,6 +4,7 @@ from quack_middle import ASTBuilder, ASTVisitor
 from quack_types import typechecker
 from quack_checks import initialization_check
 from quack_codegen import codegen
+from quack_tables import tables
 
 import argparse
 
@@ -30,7 +31,7 @@ def main():
     clazz = arguments["class"]
     s = ""
 
-    codegen.set_filename(clazz)
+    tables.set_main(clazz)
 
     # if there exists an inputfilename
     if (f_input):
@@ -55,7 +56,7 @@ def main():
     
     # run the typechecker and more middle end optimizations
     ast.check_type(typechecker)
-    while typechecker.modified:
+    while typechecker.made_changes():
         typechecker.reset()
         ast.check_type(typechecker)
 

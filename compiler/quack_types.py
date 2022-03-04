@@ -5,13 +5,18 @@ from quack_tables import tables
 class QuackTypeChecker(ASTVisitor):
 
     def __init__(self):
-        self.modified = False
+        self.modified: set = set({})
+        self.previous: set = set({})
 
     def reset(self):
-        self.modified = False
+        self.previous = self.modified.copy()
+        self.modified.clear()
 
-    def did_modify(self):
-        self.modified = True
+    def did_modify(self, modified):
+        self.modified.add(modified) 
+
+    def made_changes(self):
+        return self.modified != self.previous
         
     def VisitWhile(self, node: qm.WhileNode):
         condition_type = node.condition.check_type(self)
@@ -55,13 +60,17 @@ class QuackTypeChecker(ASTVisitor):
         return "Bool"
 
     def VisitAssignment(self, node: qm.AssignmentNode):
-        l_type = node.left.check_type(self)
+        try:
+            l_type = node.left.check_type(self)
+        except NameError:
+            l_type = node.typ
+
         r_type = node.right.check_type(self)
 
         # if l_type is none, the variable hasn't been
         # assigned a type yet. Let's do that here
         if l_type == None:
-            self.did_modify()
+            self.did_modify(l_type)
             node.left.set_type(r_type)
             node.set_type(r_type)
 
@@ -69,7 +78,7 @@ class QuackTypeChecker(ASTVisitor):
         # are different types, we find the most
         # specific common class
         elif l_type != r_type:
-            self.did_modify()
+            self.did_modify(l_type)
             new_type = tables.get_common_class(l_type, r_type)
             node.left.set_type(new_type)
             return new_type
@@ -91,7 +100,8 @@ class QuackTypeChecker(ASTVisitor):
         # then check parameter types are correct
         param_types = []
         for element in node.params:
-            param_types.append(tables.get_type(element))
+            param_types.append(element.get_type())
+            # param_types.append(tables.get_type(element))
 
         tables.check_parameters(callee_type, param_types, node.function)
         

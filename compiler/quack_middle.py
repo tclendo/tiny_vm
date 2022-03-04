@@ -96,25 +96,34 @@ class VariableNode(ASTNode):
     def get_type(self):
         return tables.get_type(self.var)
     
+    def set_type(self, typ: str):
+        tables.set_type(self.var, typ)
+
     def check_type(self, visitor: ASTVisitor):
         return tables.get_type(self.var)
 
     def check_init(self, visitor: ASTVisitor, init: set):
         pass
-
-    def set_type(self, typ: str):
-        tables.set_type(self.var, typ)
         
     def generate(self, visitor: ASTVisitor):
         return visitor.VisitVar(self)
 
 class FieldNode(ASTNode):
-    def __init__(self, left, ident):
+    def __init__(self, left: ASTNode, ident: ASTNode):
         self.left = left
         self.ident = ident
 
     def check_type(self, visitor: ASTVisitor):
-        pass
+        if self.left == "this":
+            tables.set_field(self.ident)
+            return tables.get_type(self.ident)
+
+    def set_type(self, typ: str):
+        if self.left == "this":
+            tables.set_type(self.ident, typ)
+
+        else:
+            raise ValueError("Cannot assign to field that isn't 'this'")
 
     def check_init(self, visitor: ASTVisitor, init: set):
         pass
@@ -222,13 +231,13 @@ class CallNode(ASTNode):
         return visitor.VisitCall(self)
         
 class AssignmentNode(ASTNode):
-    def __init__(self, left: VariableNode, right: ASTNode,
+    def __init__(self, left: ASTNode, right: ASTNode,
                  typ: str = None):
 
         self.left = left
         self.right = right
         self.typ = typ
-        tables.set_type(self.left.var, self.typ)
+        # tables.set_type(self.left.var, self.typ)
         
     def get_type(self):
         return self.typ
@@ -337,6 +346,33 @@ class BlockNode(ASTNode):
     def generate(self, visitor: ASTVisitor):
         self.statements.generate(visitor)
 
+class ConstructNode(ASTNode):
+    def __init__(self, ident: str, params: list):
+        self.ident = ident
+        self.params = params
+
+    def check_type(self, visitor: ASTVisitor):
+        return self.ident
+
+    def check_init(self, visitor: ASTVisitor, init: set):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        pass
+        
+class ReturnStmtNode(ASTNode):
+    def __init__(self, statement: ASTNode):
+        self.statement = statement
+
+    def check_type(self, visitor: ASTVisitor):
+        return self.statement.check_type(visitor)
+
+    def check_init(self, visitor, init):
+        pass
+
+    def generate(self, visitor: ASTVisitor):
+        visitor.VisitReturn(self)
+    
 class FormalNode(ASTNode):
     def __init__(self, ident: str, typ: str):
         self.ident = ident
@@ -372,17 +408,26 @@ class MethodNode(ASTNode):
 
             else:
                 self.formals.append(element)
-                self.formal_types.append(item.typ)
+                self.formal_types.append(element.typ)
 
     def check_type(self, visitor: ASTVisitor):
         # add method to object hierarchy
         tables.add_method(self.ident, self.formal_types, self.typ)
 
+        # add the arguments to our table
+        for element in self.formals:
+            tables.set_type(element.ident, element.typ)
+
+        # check the rest of the method block
+        self.block.check_type(visitor)
+
+        return self.typ
+
     def check_init(self, visitor: ASTVisitor, init: set):
         visitor.VisitMethod(self, init)
 
     def generate(self, visitor: ASTVisitor):
-        pass
+        visitor.VisitMethod(self)
     
 class MethodsNode(ASTNode):
     def __init__(self, methods: ASTNode, final: ASTNode):
@@ -398,7 +443,8 @@ class MethodsNode(ASTNode):
         return self.final.check_init(visitor, init)
         
     def generate(self, visitor: ASTVisitor):
-        pass
+        self.methods.generate(visitor)
+        self.final.generate(visitor)
 
 class BodyNode(ASTNode):
     def __init__(self, program: ASTNode, methods: ASTNode):
@@ -415,7 +461,7 @@ class BodyNode(ASTNode):
         visitor.VisitBody(self, init)
         
     def generate(self, visitor: ASTVisitor):
-        pass
+        visitor.VisitBody(self)
     
 class SignatureNode(ASTNode):
     def __init__(self, name: str, formals: list,
@@ -445,6 +491,11 @@ class SignatureNode(ASTNode):
         # class in our tables
         tables.set_current_object(self.name)
 
+        # add each argument into the table that exists
+        # for a given signature
+        for element in self.formals:
+            tables.set_type(element.ident, element.typ)
+
         # we just return the class name as the type
         return self.name
 
@@ -452,7 +503,10 @@ class SignatureNode(ASTNode):
         pass
 
     def generate(self, visitor: ASTVisitor):
-        pass
+        # update the current node name
+        tables.set_current_object(self.name)
+
+        visitor.VisitSignature(self)
 
 class ClassNode(ASTNode):
     def __init__(self, signature: SignatureNode, body: ASTNode):
@@ -492,7 +546,6 @@ class ClassesNode(ASTNode):
         self.final.generate(visitor)
 
 class ProgramNode(ASTNode):
-
     def __init__(self, program: ASTNode,
                  final: ASTNode):
 
@@ -520,6 +573,7 @@ class StartNode(ASTNode):
 
     def check_type(self, visitor: ASTVisitor):
         self.classes.check_type(visitor)
+        tables.set_current_object(tables.mainfilename)
         self.program.check_type(visitor)
 
     def check_init(self, visitor: ASTVisitor, init: set):
@@ -550,31 +604,27 @@ class ASTBuilder(Transformer):
     
     def signature(self, name, formals):
         return SignatureNode(name, formals, "Obj")
-        pass
 
     def signature_ext(self, name, formals, ext):
         return SignatureNode(name, formals, ext)
-        pass
         
     def formals(self, formals, formal):
         return [formals, formal]
-        pass
 
     def formal(self, ident, typ):
-        return FormalNode(ident, typ)
-        pass
+        return [FormalNode(ident, typ)]
 
     def body(self, program, methods):
         return BodyNode(program, methods)
-        pass
 
     def methods(self, methods, method):
         return MethodsNode(methods, method)
-        pass
 
     def method(self, ident, formals, typ, block):
         return MethodNode(ident, formals, typ, block)
-        pass
+    
+    def construct(self, ident, params=None):
+        return ConstructNode(ident, params)
     
     def block(self, statements):
         return BlockNode(statements)
@@ -586,7 +636,7 @@ class ASTBuilder(Transformer):
         return AssignmentNode(name, value)
 
     def call(self, callee, function, params=[]):
-        return CallNode(callee, function, params)
+        return CallNode(callee, function, [params])
 
     def parameters(self, params, stmt):
         return [params, stmt]
@@ -599,6 +649,9 @@ class ASTBuilder(Transformer):
     
     def unusedstmt(self, statement):
         return UnusedStmtNode(statement)
+    
+    def returnstmt(self, statement):
+        return ReturnStmtNode(statement)
     
     def add(self, left, right):
         return BinaryOpNode("+", left, right)
@@ -647,6 +700,9 @@ class ASTBuilder(Transformer):
 
     def field(self, left, ident):
         return FieldNode(left, ident)
+
+    def field_this(self, ident):
+        return FieldNode("this", ident)
 
     def number(self, val):
         return IntLiteralNode(val)

@@ -11,7 +11,7 @@ class QuackCodeGen(ASTVisitor):
 
     def __init__(self):
         # instruction stream that will be dumped at the end
-        self.instructions = []
+        self.instructions = {}
         self.pusharg = 0
         self.filename = ""
         self.label = 0
@@ -24,7 +24,12 @@ class QuackCodeGen(ASTVisitor):
         self.filename = name
         
     def add_instruction(self, instruction):
-        self.instructions.append(instruction)
+        # add instruction to proper container based on object
+        if tables.current_object in self.instructions.keys():
+            self.instructions[tables.current_object].append(instruction)
+
+        else:
+            self.instructions[tables.current_object] = [instruction]
 
     def create_label(self, prefix):
         label = "label" + prefix + str(self.label)
@@ -45,12 +50,12 @@ class QuackCodeGen(ASTVisitor):
 
     def print_instructions(self, stream):
         if not stream:
-            print(".class {}:Obj".format(self.filename))
+            print(".class {}:Obj".format(tables.current_object))
             print()
             print(".method $constructor")
             print(".local {}".format(','.join(tables.get_variables())))
-            for element in self.instructions:
-                print(element)
+            for instruction in self.instructions[tables.current_object]:
+                print(instruction)
 
             while self.pusharg > 0:
                 print("pop")
@@ -60,13 +65,13 @@ class QuackCodeGen(ASTVisitor):
 
         else:
             with open(stream, 'w') as f:
-                f.write(".class {}:Obj\n".format(self.filename))
+                f.write(".class {}:Obj\n".format(tables.current_object))
                 f.write("\n")
                 f.write(".method $constructor\n")
                 f.write(".local {}".format(','.join(tables.get_variables())))
                 f.write('\n')
                 # print(f".local {','.join(self.vars.keys())}")
-                for instruction in self.instructions:
+                for instruction in self.instructions[tables.current_object]:
                     f.write(instruction)
                     f.write('\n')
 
@@ -78,11 +83,57 @@ class QuackCodeGen(ASTVisitor):
 
 
 ### These methods are for recursively generating code
-### from the ASTNodes 
+### from the ASTNodes
+    def VisitStart(self, node: qm.StartNode):
+        # create all of the different classes
+        node.classes.generate(self)
 
-    def VisitUnary(self, node: qm.UnaryOpNode):
-        if node.op == '-':
-            self.add_instruction(f"call {node.get_type()}:negate")
+        # create the constructor for our global program
+        self.add_instruction(f".class {self.filename}:Obj")
+        self.add_instruction(".method $constructor")
+        self.add_instruction(".local {}".format(','.join(tables.get_variables())))
+
+        # generate the whole program
+        node.program.generate(self)
+
+    def VisitSignature(self, node: qm.SignatureNode):
+        # generate class name
+        self.add_instruction(f".class {node.name}:{node.ext}")
+
+        # generate the formal arguments
+        if node.formals != []:
+            x = [form.ident for form in node.formals]
+            self.add_instruction(".args {}".format(",".join(x)))
+
+        # generate field declarations for the class
+        if tables.get_fields(node.name) != {}:
+            for element in tables.get_fields(node.name):
+                self.add_instruction(f".field {element}")
+
+        # generate local variable declarations
+        self.add_instruction(".local {}".format(','.join(tables.get_variables())))
+        
+    def VisitBody(self, node: qm.BodyNode):
+        self.add_instruction("enter")
+        # generate constructor program
+        node.program.generate(self)
+
+        # generate the methods
+        node.methods.generate(self)
+
+    def VisitMethod(self, node: qm.MethodNode):
+        # add the method name
+        self.add_instruction(f".method {node.ident}")
+        # add the method args
+        if node.formals != []:
+            x = [form.ident for form in node.formals]
+            self.add_instruction(".args {}".format(",".join(x)))
+            
+        # enter the function
+        self.add_instruction("enter")
+
+        # generate the block
+        node.block.generate(self)
 
     def VisitIfStmt(self, node: qm.IfStmtNode):
         # first, compare for the if node
@@ -142,7 +193,10 @@ class QuackCodeGen(ASTVisitor):
             self.add_instruction(f"roll 1")
             self.add_instruction(f"call {node.get_type()}:times")
 
-            
+    def VisitUnary(self, node: qm.UnaryOpNode):
+        if node.op == '-':
+            self.add_instruction(f"call {node.get_type()}:negate")
+
     def VisitAssignment(self, node: qm.AssignmentNode):
         self.add_instruction(f"store {node.left.var}")
 

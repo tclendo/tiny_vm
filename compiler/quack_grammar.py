@@ -29,6 +29,7 @@ quack_grammar = """
 | r_expr ";" -> unusedstmt 
 | "while" condition block -> whilestmt
 | "if" condition block otherwise? -> ifstmt
+| "return" r_expr ";" -> returnstmt
 
 ?otherwise: "else" block
 | "elif" condition block otherwise? -> ifstmt
@@ -43,11 +44,12 @@ quack_grammar = """
 ?condition: r_expr
 
 ?l_expr: IDENT -> var
+| "this" "." IDENT -> field_this
 
 ?r_expr: not 
 
-?params: l_expr
-| params "," l_expr -> parameters
+?params: r_expr
+| params "," r_expr -> parameters
 
 ?not: or
 | "not" comparison -> not_op
@@ -79,6 +81,7 @@ quack_grammar = """
 ?access: atom
 | access "." IDENT -> field
 | access "." IDENT "(" params? ")" -> call
+| IDENT "(" params? ")" -> construct
 
 ?atom: NUMBER      -> number
 | STRING -> str_lit

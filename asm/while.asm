@@ -15,11 +15,11 @@ labelwhilebody3:
 load y
 load y
 const 1
+roll 1
 call Int:plus
 store y
 load y
 call Int:print
-pop
 labelwhilecmp2:
 load y
 const 3
@@ -34,7 +34,6 @@ call Int:minus
 store x
 load x
 call Int:print
-pop
 labelwhilecmp0:
 load x
 const 1
