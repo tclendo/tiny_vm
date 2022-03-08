@@ -12,9 +12,11 @@ class QuackCodeGen(ASTVisitor):
     def __init__(self):
         # instruction stream that will be dumped at the end
         self.instructions = {}
-        self.pusharg = 0
-        self.filename = ""
+        self.returnargs = 0
+        self.filename = tables.mainfilename
+        self.settab = False
         self.label = 0
+        self.is_construct = False
 
     # TODO: Modularize walks for ASTVisitor
     # the codegen class will always generate
@@ -26,10 +28,20 @@ class QuackCodeGen(ASTVisitor):
     def add_instruction(self, instruction):
         # add instruction to proper container based on object
         if tables.current_object in self.instructions.keys():
+            if self.settab:
+                self.instructions[tables.current_object].append("    ")
+
             self.instructions[tables.current_object].append(instruction)
 
         else:
-            self.instructions[tables.current_object] = [instruction]
+            if self.settab:
+                self.instructions[tables.current_object] = ["    "]
+                self.instructions[tables.current_object].append(instruction)
+
+            else:
+                self.instructions[tables.current_object] = [instruction]
+
+        self.instructions[tables.current_object].append("\n")
 
     def create_label(self, prefix):
         label = "label" + prefix + str(self.label)
@@ -37,7 +49,9 @@ class QuackCodeGen(ASTVisitor):
         return label
 
     def add_label(self, label):
+        self.settab = False
         self.add_instruction(f"{label}:")
+        self.settab = True
 
     def add_jump(self, label):
         self.add_instruction(f"jump {label}")
@@ -50,90 +64,122 @@ class QuackCodeGen(ASTVisitor):
 
     def print_instructions(self, stream):
         if not stream:
-            print(".class {}:Obj".format(tables.current_object))
-            print()
-            print(".method $constructor")
-            print(".local {}".format(','.join(tables.get_variables())))
-            for instruction in self.instructions[tables.current_object]:
-                print(instruction)
-
-            while self.pusharg > 0:
-                print("pop")
-                self.pusharg -= 1
-
-            print("return 0\n")
+            for obj in self.instructions:
+                for instruction in self.instructions[obj]:
+                    print(instruction)
 
         else:
-            with open(stream, 'w') as f:
-                f.write(".class {}:Obj\n".format(tables.current_object))
-                f.write("\n")
-                f.write(".method $constructor\n")
-                f.write(".local {}".format(','.join(tables.get_variables())))
-                f.write('\n')
-                # print(f".local {','.join(self.vars.keys())}")
-                for instruction in self.instructions[tables.current_object]:
-                    f.write(instruction)
-                    f.write('\n')
-
-                while self.pusharg > 0:
-                    f.write("pop\n")
-                    self.pusharg -= 1
-
-                f.write("return 0")
+            for obj in self.instructions:
+                filename = "asm/" + obj + ".asm"
+                with open(filename, 'w') as f:
+                    for instruction in self.instructions[obj]:
+                        f.write(instruction)
 
 
 ### These methods are for recursively generating code
 ### from the ASTNodes
-    def VisitStart(self, node: qm.StartNode):
+    def VisitStartNode(self, node: qm.StartNode):
         # create all of the different classes
-        node.classes.generate(self)
+        if node.classes != None:
+            node.classes.generate(self)
 
+        tables.set_current_object(tables.mainfilename)
         # create the constructor for our global program
-        self.add_instruction(f".class {self.filename}:Obj")
+        self.settab = False
+        self.add_instruction(f".class {tables.mainfilename}:Obj")
         self.add_instruction(".method $constructor")
         self.add_instruction(".local {}".format(','.join(tables.get_variables())))
+        self.settab = True
+        self.add_instruction("enter")
 
         # generate the whole program
         node.program.generate(self)
+        self.add_instruction("return 0")
 
     def VisitSignature(self, node: qm.SignatureNode):
         # generate class name
+        self.settab = False
         self.add_instruction(f".class {node.name}:{node.ext}")
-
-        # generate the formal arguments
-        if node.formals != []:
-            x = [form.ident for form in node.formals]
-            self.add_instruction(".args {}".format(",".join(x)))
 
         # generate field declarations for the class
         if tables.get_fields(node.name) != {}:
             for element in tables.get_fields(node.name):
                 self.add_instruction(f".field {element}")
 
+        self.add_instruction(f".method $constructor")
+        self.is_construct = True
+
+        # generate the formal arguments
+        if node.formals != []:
+            x = [form.ident for form in node.formals]
+            self.returnargs = len(x)
+            self.add_instruction(".args {}".format(",".join(x)))
+
         # generate local variable declarations
-        self.add_instruction(".local {}".format(','.join(tables.get_variables())))
+        args = tables.get_arguments()
+        variables = tables.get_variables()
+        locs = []
+        for element in variables:
+            if element not in args:
+                locs.append(element)
+
+        if locs != []:
+            self.add_instruction(".local {}".format(','.join(locs)))
+            
+        self.settab = True
+
+    def VisitConstruct(self, node: qm.ConstructNode):
+        self.add_instruction(f"new {node.ident}")
+        self.add_instruction(f"call {node.ident}:$constructor")
         
+    def VisitField(self, node: qm.FieldNode):
+        if node.left == "this":
+            self.add_instruction("load $")
+            self.add_instruction(f"load_field $:{node.ident}")
+        else:
+            self.add_instruction(f"load_field {node.left.get_type()}:{node.ident}")
+
     def VisitBody(self, node: qm.BodyNode):
         self.add_instruction("enter")
         # generate constructor program
         node.program.generate(self)
+        if self.is_construct:
+            self.add_instruction("load $")
+            self.is_construct = False
+        self.add_instruction(f"return {self.returnargs}")
+        self.returnargs = 0
 
         # generate the methods
         node.methods.generate(self)
 
     def VisitMethod(self, node: qm.MethodNode):
         # add the method name
+        self.settab = False
         self.add_instruction(f".method {node.ident}")
         # add the method args
         if node.formals != []:
             x = [form.ident for form in node.formals]
+            self.returnargs = len(x)
             self.add_instruction(".args {}".format(",".join(x)))
+
+        args = tables.get_arguments()
+        variables = tables.get_variables()
+        locs = []
+        for element in variables:
+            if element not in args:
+                locs.append(element)
+
+        if locs != []:
+            self.add_instruction(".local {}".format(','.join(locs)))
             
         # enter the function
+        self.settab = True
         self.add_instruction("enter")
 
         # generate the block
         node.block.generate(self)
+        self.add_instruction(f"return {self.returnargs}")
+        self.returnargs = 0
 
     def VisitIfStmt(self, node: qm.IfStmtNode):
         # first, compare for the if node
@@ -197,8 +243,18 @@ class QuackCodeGen(ASTVisitor):
         if node.op == '-':
             self.add_instruction(f"call {node.get_type()}:negate")
 
+    def VisitReturn(self, node: qm.ReturnStmtNode):
+        node.statement.generate(self)
+        
     def VisitAssignment(self, node: qm.AssignmentNode):
-        self.add_instruction(f"store {node.left.var}")
+        if isinstance(node.left, qm.VariableNode):
+            node.left.generate(self)
+            node.right.generate(self)
+            self.add_instruction(f"store {node.left.var}")
+        else:
+            node.right.generate(self)
+            self.add_instruction(f"load $")
+            self.add_instruction(f"store_field $:{node.left.ident}")
 
     def VisitComparison(self, node: qm.ComparisonNode):
         if node.op == '==':
@@ -229,7 +285,17 @@ class QuackCodeGen(ASTVisitor):
             node.c_eval(self)
         
     def VisitCall(self, node: qm.CallNode):
-        self.add_instruction(f"call {node.callee.get_type()}:{node.function}")
+        typ = node.callee.get_type()
+        func = node.function
+
+        # check arguments and roll properly so that the object is on the top
+        # of the stack.
+        if tables.get_parameters(typ, func) == []:
+            self.add_instruction(f"call {node.callee.get_type()}:{node.function}")
+
+        else:
+            self.add_instruction(f"roll {len(tables.get_parameters(typ, func))}")
+            self.add_instruction(f"call {node.callee.get_type()}:{node.function}")
 
     def VisitUnused(self, node: qm.UnusedStmtNode):
         # an unused stmt just needs to pop an item off

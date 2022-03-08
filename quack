@@ -7,6 +7,13 @@ python3 compiler/quack_frontend.py -i=$1 -o=asm/${srcname}.asm -c=${srcname};
 if [ $? == 0 ]
 then
 	echo "Compiled $1 -> ${srcname}.asm";
+
+	input="_QK_TMP_CLASSES_.txt"
+	while IFS= read -r line
+	do
+	    python3 assemble.py asm/${line}.asm OBJ/${line}.json
+	done < "$input"
+
 	python3 assemble.py asm/${srcname}.asm OBJ/${srcname}.json;
 
 	if [ $? == 0 ]
@@ -14,8 +21,14 @@ then
 		echo "Assembled ${srcname}.asm -> ${srcname}.json";
 		if [ $# -eq 2 ]
 		then
-			bin/tiny_vm -L OBJ ${srcname}
+		        if [ $2 == "rund" ]
+			then
+			    bin/tiny_vm -L OBJ -D ${srcname}
+			else
+			    bin/tiny_vm -L OBJ ${srcname}
+			fi
 		fi
+		rm ${input}
 		echo "Done";
 	else
 		echo "Error assembling. Aborted";

@@ -30,7 +30,7 @@ class ASTVisitor():
     def VisitFormal(self, node):
         raise NotImplementedError()
 
-    def VisitFormal(self, node):
+    def VisitConstruct(self, node):
         raise NotImplementedError()
 
     def VisitClass(self, node):

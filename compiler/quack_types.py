@@ -64,6 +64,7 @@ class QuackTypeChecker(ASTVisitor):
             l_type = node.left.check_type(self)
         except NameError:
             l_type = node.typ
+            node.left.set_type(l_type)
 
         r_type = node.right.check_type(self)
 

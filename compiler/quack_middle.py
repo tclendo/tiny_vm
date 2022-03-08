@@ -117,6 +117,13 @@ class FieldNode(ASTNode):
         if self.left == "this":
             tables.set_field(self.ident)
             return tables.get_type(self.ident)
+        else:
+            # temporarily change 'current' class so we can look up the field
+            tmp = tables.current_object
+            tables.current_object = self.left.get_type()
+            typ = tables.get_type(self.ident)
+            tables.current_object = tmp
+            return typ
 
     def set_type(self, typ: str):
         if self.left == "this":
@@ -125,11 +132,18 @@ class FieldNode(ASTNode):
         else:
             raise ValueError("Cannot assign to field that isn't 'this'")
 
+    def get_type(self):
+            tmp = tables.current_object
+            tables.current_object = self.left.get_type()
+            typ = tables.get_type(self.ident)
+            tables.current_object = tmp
+            return typ
+        
     def check_init(self, visitor: ASTVisitor, init: set):
         pass
 
     def generate(self, visitor: ASTVisitor):
-        pass
+        visitor.VisitField(self)
 
 class UnaryOpNode(ASTNode):
     def __init__(self, op: str, child: ASTNode):
@@ -347,7 +361,7 @@ class BlockNode(ASTNode):
         self.statements.generate(visitor)
 
 class ConstructNode(ASTNode):
-    def __init__(self, ident: str, params: list):
+    def __init__(self, ident: str, params):
         self.ident = ident
         self.params = params
 
@@ -358,7 +372,14 @@ class ConstructNode(ASTNode):
         pass
 
     def generate(self, visitor: ASTVisitor):
-        pass
+        if isinstance(self.params, list):
+            for element in self.params:
+                element.generate(visitor)
+
+        else:
+            self.params.generate(visitor)
+
+        visitor.VisitConstruct(self)
         
 class ReturnStmtNode(ASTNode):
     def __init__(self, statement: ASTNode):
@@ -417,6 +438,7 @@ class MethodNode(ASTNode):
         # add the arguments to our table
         for element in self.formals:
             tables.set_type(element.ident, element.typ)
+            tables.add_argument(element.ident, element.typ)
 
         # check the rest of the method block
         self.block.check_type(visitor)
@@ -495,6 +517,7 @@ class SignatureNode(ASTNode):
         # for a given signature
         for element in self.formals:
             tables.set_type(element.ident, element.typ)
+            tables.add_argument(element.ident, element.typ)
 
         # we just return the class name as the type
         return self.name
@@ -505,7 +528,6 @@ class SignatureNode(ASTNode):
     def generate(self, visitor: ASTVisitor):
         # update the current node name
         tables.set_current_object(self.name)
-
         visitor.VisitSignature(self)
 
 class ClassNode(ASTNode):
@@ -572,17 +594,19 @@ class StartNode(ASTNode):
         self.program = program 
 
     def check_type(self, visitor: ASTVisitor):
-        self.classes.check_type(visitor)
+        if self.classes != None:
+            self.classes.check_type(visitor)
+
         tables.set_current_object(tables.mainfilename)
         self.program.check_type(visitor)
 
     def check_init(self, visitor: ASTVisitor, init: set):
-        self.classes.check_init(visitor, init)
+        if self.classes != None:
+            self.classes.check_init(visitor, init)
         self.program.check_init(visitor, init)
 
     def generate(self, visitor: ASTVisitor):
-        self.classes.generate(visitor)
-        self.program.generate(visitor)
+        visitor.VisitStartNode(self)
 
 @v_args(inline=True)    # Affects the signatures of the methods
 class ASTBuilder(Transformer):
@@ -590,9 +614,12 @@ class ASTBuilder(Transformer):
     def __init__(self):
         pass
 
-    def start(self, classes, program):
+    def start_c(self, classes, program):
         return StartNode(classes, program)
 
+    def start(self, program):
+        return StartNode(None, program)
+    
     def prog(self, program, statement):
         return ProgramNode(program, statement)
 
@@ -607,7 +634,7 @@ class ASTBuilder(Transformer):
 
     def signature_ext(self, name, formals, ext):
         return SignatureNode(name, formals, ext)
-        
+
     def formals(self, formals, formal):
         return [formals, formal]
 

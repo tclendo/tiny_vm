@@ -11,6 +11,7 @@ class Tables():
         self.arguments = {}
         # dictionary for objects and their methods
         self.objects = default_class_map
+        self.using_methods = []
         # current object for type checking and updating
         # the class hierarchy information for user-added
         # classes
@@ -21,8 +22,16 @@ class Tables():
     def set_main(self, name):
         self.mainfilename = name
         self.variables[self.mainfilename] = {}
+        self.arguments[self.mainfilename] = {}
         self.current_object = self.mainfilename
         
+    def set_current_object(self, name: str):
+        self.current_object = name
+        if name not in self.variables.keys():
+            self.variables[name] = {}
+        if name not in self.arguments.keys():
+            self.arguments[name] = {}
+
     def set_type(self, item, typ):
         self.variables[self.current_object][item] = typ
         
@@ -34,8 +43,14 @@ class Tables():
             raise NameError(f"In class \"{self.current_object}\": Variable \"{item}\" not found in table.")
 
     def get_variables(self):
-        return self.variables[self.current_object]
+        return self.variables[self.current_object].keys()
 
+    def get_arguments(self):
+        return self.arguments[self.current_object].keys()
+
+    def add_argument(self, arg, typ):
+        self.arguments[self.current_object][arg] = typ
+    
     def set_variables(self, var_dict: dict):
         for element in var_dict.keys():
             self.variables[element] = var_dict[element]
@@ -47,6 +62,9 @@ class Tables():
     def add_object(self, name: str, ext: str):
         # when adding an object, we need to copy everything over
         # from the class it extends in the same order as well
+        if name not in self.objects.keys():
+            self.using_methods.append(name)
+
         self.objects[name] = {
             "superclass": ext,
             "field_list": set(self.objects[ext]["field_list"]),
@@ -60,8 +78,6 @@ class Tables():
     def add_method(self, name: str, formals: list, typ: str):
         self.objects[self.current_object]["method_returns"][name] = typ
         self.objects[self.current_object]["method_args"][name] = formals
-    def set_current_object(self, name: str):
-        self.current_object = name
 
     def get_signature(self, typ, func):
         try:
@@ -86,7 +102,7 @@ class Tables():
         self.params[clas][func] = params
 
     def get_parameters(self, clas, func):
-        return self.params[clas][func]
+        return self.objects[clas]["method_args"][func]
 
     def set_field(self, field):
         self.objects[self.current_object]["field_list"].add(field)

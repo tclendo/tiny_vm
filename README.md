@@ -37,3 +37,19 @@ If you get an error saying permission denied, try running
 	1. bash quack <filename> <run>?
 
 If you add the optional 'run' parameter, it will run the code on the tiny_vm as well (as long as it exists). It will also automatically compile the proper object file name based on the name passed into the compiler.
+
+## HW4 (final) Changes
+
+Homework 4 introduced classes, fields, and other cool shenanigans. Also, the quack script has been updated. To compile a quack source file, simply enter this:
+
+	1. ./quack path/to/file.qk
+
+If you would like to compile and run on the tiny_vm, make sure the tiny_vm is built, and run:
+
+	2. ./quack path/to/file.qk run
+
+If you would like to compile and run in debug mode, enter this instead:
+
+	3. ./quack path/to/file.qk rund
+
+All of my sample source files, with a few bad examples to highlight the analysis of my quack compiler, are in the 'src' directory. I suggest writing your files there, although it should still work no matter where the path to the quack source file is.

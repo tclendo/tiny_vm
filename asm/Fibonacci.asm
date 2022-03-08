@@ -1,0 +1,37 @@
+.class Fibonacci:Obj
+.method $constructor
+.local ten,twenty
+    enter
+    load ten
+    const 10
+    new Fib
+    call Fib:$constructor
+    load ten
+    const 10
+    new Fib
+    call Fib:$constructor
+    store ten
+    load ten
+    const 0
+    roll 1
+    call Fib:Calculate
+    call Int:print
+    const "\n"
+    call String:print
+    load twenty
+    const 20
+    new Fib
+    call Fib:$constructor
+    load twenty
+    const 20
+    new Fib
+    call Fib:$constructor
+    store twenty
+    load twenty
+    const 0
+    roll 1
+    call Fib:Calculate
+    call Int:print
+    const "\n"
+    call String:print
+    return 0

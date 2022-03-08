@@ -1,6 +1,6 @@
 quack_grammar = """
-?start: classes program -> start
-| program
+?start: classes program -> start_c
+| program -> start
 
 ?classes: class
 | classes class -> classes

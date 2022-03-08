@@ -1,0 +1,40 @@
+.class classtest:Obj
+.method $constructor
+.local test,seven,eight
+    enter
+    load test
+    const 1
+    new Test
+    call Test:$constructor
+    load test
+    const 1
+    new Test
+    call Test:$constructor
+    store test
+    load seven
+    load test
+    const 7
+    roll 1
+    call Test:Number
+    load seven
+    load test
+    const 7
+    roll 1
+    call Test:Number
+    store seven
+    load seven
+    call Int:print
+    load eight
+    load test
+    const 8
+    roll 1
+    call Test:Number
+    load eight
+    load test
+    const 8
+    roll 1
+    call Test:Number
+    store eight
+    load eight
+    call Int:print
+    return 0

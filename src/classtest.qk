@@ -1,12 +1,14 @@
 class Test(x: Int) {
   this.x = x;
 
-  def Seven(seven: Int) : Int {
-    this.x = seven;
+  def Number(num: Int) : Int {
+    this.x = num;
     return this.x;
   }
 }
 
 test = Test(1);
-seven = test.Seven(7);
+seven = test.Number(7);
 seven.print();
+eight = test.Number(8);
+eight.print();

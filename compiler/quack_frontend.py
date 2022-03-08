@@ -66,5 +66,11 @@ def main():
     # print the code to corresponding output
     codegen.print_instructions(f_output)
         
+    # write to temporary file to assemble class files properly
+    with open("_QK_TMP_CLASSES_.txt", "w", encoding='utf-8') as f:
+        for element in tables.using_methods:
+            f.write(element)
+            f.write("\n")
+
 if __name__ == '__main__':
     main()

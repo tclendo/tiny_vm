@@ -1,0 +1,25 @@
+class Fib(amount: Int) {
+  this.start = 0;
+  this.next = 1;
+  this.amount = amount;
+
+  def Calculate(start: Int) : Int {
+    x = start;
+    while x < this.amount {
+      temp = this.next;
+      this.next = this.start + this.next;
+      this.start = temp;
+      x = x + 1;
+    }
+    return this.next;
+  }
+
+}
+
+ten = Fib(10);
+ten.Calculate(1).print();
+"\n".print();
+
+twenty = Fib(20);
+twenty.Calculate(1).print();
+"\n".print();

@@ -1,0 +1,89 @@
+.class Fib:Obj
+.field next
+.field start
+.field amount
+.method $constructor
+.args amount
+.local next,x,temp
+    enter
+    load $
+    load_field $:start
+    const 0
+    const 0
+    load $
+    store_field $:start
+    load $
+    load_field $:next
+    const 1
+    const 1
+    load $
+    store_field $:next
+    load $
+    load_field $:amount
+    load amount
+    load amount
+    load $
+    store_field $:amount
+    load $
+    return 1
+.method Calculate
+.args start
+.local next,x,temp
+    enter
+    load x
+    load start
+    load x
+    load start
+    store x
+    jump labelwhilecmp0
+labelwhilebody1:
+    load temp
+    load $
+    load_field $:next
+    load temp
+    load $
+    load_field $:next
+    store temp
+    load $
+    load_field $:next
+    load $
+    load_field $:start
+    load $
+    load_field $:next
+    roll 1
+    call Int:plus
+    load $
+    load_field $:start
+    load $
+    load_field $:next
+    roll 1
+    call Int:plus
+    load $
+    store_field $:next
+    load $
+    load_field $:start
+    load temp
+    load temp
+    load $
+    store_field $:start
+    load x
+    load x
+    const 1
+    roll 1
+    call Int:plus
+    load x
+    load x
+    const 1
+    roll 1
+    call Int:plus
+    store x
+labelwhilecmp0:
+    load x
+    load $
+    load_field $:amount
+    call Int:greater
+    jump_if labelwhilebody1
+endlabelwhilecmp0:
+    load $
+    load_field $:next
+    return 1
