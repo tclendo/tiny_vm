@@ -53,3 +53,5 @@ If you would like to compile and run in debug mode, enter this instead:
 	3. ./quack path/to/file.qk rund
 
 All of my sample source files, with a few bad examples to highlight the analysis of my quack compiler, are in the 'src' directory. I suggest writing your files there, although it should still work no matter where the path to the quack source file is.
+
+# NOTE: Untested features - "Field Chaining" (x.y.z), There is no typecase, Ordering of classes & dependencies, and potentially a few more that I may have missed reading the whole quack document.
